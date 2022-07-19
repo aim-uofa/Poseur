@@ -34,7 +34,7 @@ wget https://cloudstor.aarnet.edu.au/plus/s/UXr1Dn9w6ja4fM9/download -O poseur_2
 
 Name | AP | AP.5| AP.75 |download
 --- |:---:|:---:|:---:|:---:
-[Poseur_R50_COCO_256x192](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_r50_coco_256x192.py)| 75.5  | 90.7 |82.6 | [model](https://cloudstor.aarnet.edu.au/plus/s/chF3VKQT4RDoEqC/download)
+[Poseur_R50_COCO_256x192](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_r50_coco_256x192.py)| 75.5  | 90.7 |82.6 | [model](https://cloudstor.aarnet.edu.au/plus/s/UXr1Dn9w6ja4fM9/download)
 
 
 *Disclaimer:*
