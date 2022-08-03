@@ -397,7 +397,7 @@ class RLERegressionHead(nn.Module):
         for m in self.fc_layers:
             if isinstance(m, nn.Linear):
                 nn.init.xavier_uniform_(m.weight, gain=0.01)
-        # import pdb
+        
         # pdb.set_trace()
         # for m in self.flow.t:
         #     for mm in m.modules():

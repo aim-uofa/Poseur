@@ -80,8 +80,8 @@ def fliplr_rle_regression(regression,
         regression_flipped[..., right, :] = regression[..., left, :]
         regression_score_flipped[..., left, :] = regression_score[..., right, :]
         regression_score_flipped[..., right, :] = regression_score[..., left, :]
-    # import pdb
-    # pdb.set_trace()
+    
+    
     # Flip horizontally
     regression_flipped[..., 0] = x_c * 2 - regression_flipped[..., 0]
     return regression_flipped, regression_score_flipped
@@ -355,8 +355,8 @@ class Poseur_noise_sample(nn.Module):
         if not self.as_two_stage:
             query_embeds = self.query_embedding.weight
 
-        # import pdb
-        # pdb.set_trace()
+        
+        
         memory, spatial_shapes, level_start_index, hs, init_reference, inter_references, \
         enc_outputs = self.transformer(
             mlvl_feats,
@@ -393,8 +393,8 @@ class Poseur_noise_sample(nn.Module):
                 reference = inter_references[lvl - 1]
             reference = inverse_sigmoid(reference)
 
-            # import pdb
-            # pdb.set_trace()
+            
+            
             # hs: lvl, bs, 17, 256
             tmp = self.fc_coord_branches[lvl](hs[lvl])
             tmp[..., :2] += reference
@@ -408,8 +408,8 @@ class Poseur_noise_sample(nn.Module):
             outputs_coord = outputs_coord + delta_coord_output
             outputs_coords.append(outputs_coord)
 
-        # import pdb
-        # pdb.set_trace()
+        
+        
         # [num_decoder, bs, 17, 2]
         if self.with_box_refine:
             outputs_coords = torch.stack(outputs_coords)
@@ -469,8 +469,8 @@ class Poseur_noise_sample(nn.Module):
         assert not isinstance(self.loss_coord_enc, nn.Sequential)
         assert target.dim() == 3 and target_weight.dim() == 3
 
-        # import pdb
-        # pdb.set_trace()
+        
+        
         BATCH_SIZE = output.sigma.size(0)
         gt_uv = target.reshape(output.pred_jts.shape)
         bar_mu = (output.pred_jts - gt_uv) / output.sigma
@@ -500,11 +500,11 @@ class Poseur_noise_sample(nn.Module):
         assert target.dim() == 3 and target_weight.dim() == 3
         target = target.repeat(1,self.transformer.num_noise_sample+1,1)
         target_weight = target_weight.repeat(1,self.transformer.num_noise_sample+1,1)
-        # import pdb
-        # pdb.set_trace()
+        
+        
         if self.with_box_refine:
-                # import pdb
-                # pdb.set_trace()
+                
+                
             if self.use_dec_rle_loss:
                 for i, (pred_jts, sigma) in enumerate(zip(output.pred_jts, output.sigma)):
                     output_i = EasyDict(
@@ -590,12 +590,12 @@ class Poseur_noise_sample(nn.Module):
                             losses['mse_loss_enc_layer{}_c{}'.format(lvl, i + 3)] = loss_weight * self.loss_hp[i + 1](
                                 out_hp_enc[lvl][i], target_i, target_weight_i)
         else:
-            # import pdb
-            # pdb.set_trace()
+            
+            
             assert target.dim() == 4 and target_weight.dim() == 3
             losses['mse_loss'] = self.loss_hp(output, target, target_weight)
-        # import pdb
-        # pdb.set_trace()
+        
+        
         return losses
 
     def get_accuracy(self, enc_output, dec_output, coord_target, coord_target_weight, hp_target, hp_target_weight):
@@ -762,8 +762,8 @@ class Poseur_noise_sample(nn.Module):
 
             if 'bbox_score' in img_metas[i]:
                 # score[i] = np.array(img_metas[i]['bbox_score']).reshape(-1)
-                # import pdb
-                # pdb.set_trace()
+                
+                
                 score[i] = np.array(img_metas[i]['bbox_score']).reshape(-1) + np.mean(output_regression_score[i]) + np.max(output_regression_score[i])
             if bbox_ids is not None:
                 bbox_ids.append(img_metas[i]['bbox_id'])
@@ -774,7 +774,8 @@ class Poseur_noise_sample(nn.Module):
         all_preds = np.zeros((batch_size, preds.shape[1], 3), dtype=np.float32)
         all_boxes = np.zeros((batch_size, 6), dtype=np.float32)
         all_preds[:, :, 0:2] = preds[:, :, 0:2]
-        all_preds[:, :, 2:3] = maxvals
+        # all_preds[:, :, 2:3] = maxvals
+        all_preds[:, :, 2:3] = output_regression_score
         all_boxes[:, 0:2] = c[:, 0:2]
         all_boxes[:, 2:4] = s[:, 0:2]
         all_boxes[:, 4] = np.prod(s * 200.0, axis=1)

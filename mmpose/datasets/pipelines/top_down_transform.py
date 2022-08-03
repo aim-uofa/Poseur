@@ -881,6 +881,6 @@ class TopDownGenerateCoordAndHeatMapTarget(TopDownGenerateTarget, TopDownGenerat
 
         results['hp_target'] = target
         results['hp_target_weight'] = target_weight
-        # import pdb
+        
         # pdb.set_trace()
         return results

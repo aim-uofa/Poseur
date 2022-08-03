@@ -114,8 +114,8 @@ class Poseur(TopDown):
         if self.with_keypoint:
             # output = self.keypoint_head(output, img_metas)
             enc_output, dec_output = self.keypoint_head(output)
-        # import pdb
-        # pdb.set_trace()
+        
+        
         # if return loss
         losses = dict()
         if self.with_keypoint:
