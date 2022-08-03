@@ -28,7 +28,7 @@ class RLELoss_poseur(nn.Module):
         gt_uv_weight = target_uv_weight.reshape(pred_jts.shape)
 
         
-        # pdb.set_trace()
+        
         nf_loss = output.nf_loss * gt_uv_weight[:, :, :1] 
         # print(gt_uv.min(), gt_uv.max())
 

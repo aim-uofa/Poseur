@@ -936,7 +936,7 @@ class PoseurTransformer_v3(Transformer):
         else:
             proposals = proposals * scale
         
-        # pdb.set_trace()
+        
         # N, L, 2, 128
         pos = proposals[:, :, :, None] / dim_t
         # N, L, 2, 64, 2
