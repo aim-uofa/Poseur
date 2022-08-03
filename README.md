@@ -36,7 +36,7 @@ wget https://cloudstor.aarnet.edu.au/plus/s/UXr1Dn9w6ja4fM9/download -O poseur_2
 
 For visualizing on COCO, run the following command lines:
 ```
-CUDA_VISIBLE_DEVICES=2 python demo/top_down_img_demo.py \
+python demo/top_down_img_demo.py \
     configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_r50_coco_256x192.py \
     poseur_256x192_r50_6dec_coco.pth \
     --img-root tests/data/coco/ --json-file tests/data/coco/test_coco.json \
