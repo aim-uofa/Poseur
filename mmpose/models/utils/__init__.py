@@ -9,7 +9,7 @@ from .tcformer_utils import (TCFormerDynamicBlock, TCFormerRegularBlock,
                              TokenConv, cluster_dpc_knn, merge_tokens,
                              token2map, token_interp)
 from .transformer import (PatchEmbed, PatchMerging, nchw_to_nlc, nlc_to_nchw, 
-                            TFPoseTransformer_v3, DetrTransformerEncoder_zero_layer,
+                            PoseurTransformer_v3, DetrTransformerEncoder_zero_layer,
                             DeformableDetrTransformerDecoder, DetrTransformerDecoderLayer_grouped)
 
 from .positional_encoding import (LearnedPositionalEncoding,

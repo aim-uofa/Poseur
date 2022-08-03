@@ -714,7 +714,7 @@ class Transformer(BaseModule):
         memory = memory.permute(1, 2, 0).reshape(bs, c, h, w)
         return out_dec, memory
 @TRANSFORMER.register_module()
-class TFPoseTransformer_v3(Transformer):
+class PoseurTransformer_v3(Transformer):
     """ add noise training """
 
     def __init__(self,
@@ -735,7 +735,7 @@ class TFPoseTransformer_v3(Transformer):
                  noise_sigma = 0.2,
                  embed_dims = 256,
                  **kwargs):
-        super(TFPoseTransformer_v3, self).__init__(**kwargs)
+        super(PoseurTransformer_v3, self).__init__(**kwargs)
         assert query_pose_emb == True
         self.num_noise_sample = num_noise_sample
         self.num_noise_point = num_noise_point

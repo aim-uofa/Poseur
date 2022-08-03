@@ -22,7 +22,7 @@ from .top_down import TopDown
 
 
 @POSENETS.register_module()
-class TFPose(TopDown):
+class Poseur(TopDown):
     def __init__(self, *args, **kwargs):
         if 'filp_fuse_type' in kwargs:
             self.filp_fuse_type = kwargs.pop('filp_fuse_type')

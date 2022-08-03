@@ -49,7 +49,7 @@ emb_dim = 256
 # model settings
 norm_cfg = dict(type='SyncBN', requires_grad=True)
 model = dict(
-    type='TFPose',
+    type='Poseur',
     pretrained='torchvision://resnet50',
     backbone=dict(type='ResNet', norm_cfg = norm_cfg, depth=50, num_stages=4, out_indices=(0, 1, 2, 3)),
     neck=dict(
@@ -62,7 +62,7 @@ model = dict(
         norm_cfg=dict(type='GN', num_groups=32),
     ),
     keypoint_head=dict(
-        type='TFPose_nose_samlpe',
+        type='Poseur_noise_sample',
         in_channels=512,
         num_queries=17,
         num_reg_fcs=2,
@@ -79,7 +79,7 @@ model = dict(
             normalize=True,
             offset=-0.5),
         transformer=dict(
-            type='TFPoseTransformer_v3',
+            type='PoseurTransformer_v3',
             query_pose_emb = True,
             embed_dims = emb_dim,
             encoder=dict(

@@ -14,7 +14,7 @@ from .topdown_heatmap_multi_stage_head import (TopdownHeatmapMSMUHead,
 from .topdown_heatmap_simple_head import TopdownHeatmapSimpleHead
 from .vipnas_heatmap_simple_head import ViPNASHeatmapSimpleHead
 from .voxelpose_head import CuboidCenterHead, CuboidPoseHead
-from .poseur_head import TFPose_nose_samlpe
+from .poseur_head import Poseur_noise_sample
 
 __all__ = [
     'TopdownHeatmapSimpleHead', 'TopdownHeatmapMultiStageHead',

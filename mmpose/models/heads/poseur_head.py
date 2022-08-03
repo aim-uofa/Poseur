@@ -108,9 +108,9 @@ class Linear_with_norm(nn.Module):
 
 
 @HEADS.register_module()
-class TFPose_nose_samlpe(nn.Module):
+class Poseur_noise_sample(nn.Module):
     """
-    rle loss for tfpose
+    rle loss for Poseur
     """
 
     def __init__(self,
