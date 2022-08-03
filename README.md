@@ -11,7 +11,12 @@
 This is a preview for Poseur, which currently including Poseur with R-50 backbone for both training and inference. More models with various backbones will be released soon. This project is bulit upon [MMPose](https://github.com/open-mmlab/mmpose) with commit ID [eeebc652842a9724259ed345c00112641d8ee06d](https://github.com/open-mmlab/mmpose/commit/eeebc652842a9724259ed345c00112641d8ee06d).
 
 # Installation & Quick Start
-First, follow the [MMPose instruction](mmpose_README.md) to install the project and set up the datasets (MS-COCO).
+1. Install following packages
+```
+pip install easydict, einops
+
+```
+2. Follow the [MMPose instruction](mmpose_README.md) to install the project and set up the datasets (MS-COCO).
 
 For training on COCO, run:
 ```
@@ -20,13 +25,22 @@ configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_r50_coco_256x192.py 8 \
 --work-dir work_dirs/poseur_r50_coco_256x192
 ```
 
-For evaluation on COCO, run the following command lines:
+For evaluating on COCO, run the following command lines:
 ```
 wget https://cloudstor.aarnet.edu.au/plus/s/UXr1Dn9w6ja4fM9/download -O poseur_256x192_r50_6dec_coco.pth
 ./tools/dist_test.sh configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_r50_coco_256x192.py \
     poseur_256x192_r50_6dec_coco.pth 4 \
     --eval mAP \
     --cfg-options model.filp_fuse_type=\'type2\'
+```
+
+For visualizing on COCO, run the following command lines:
+```
+CUDA_VISIBLE_DEVICES=2 python demo/top_down_img_demo.py \
+    configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_r50_coco_256x192.py \
+    poseur_256x192_r50_6dec_coco.pth \
+    --img-root tests/data/coco/ --json-file tests/data/coco/test_coco.json \
+    --out-img-root vis_results_poseur
 ```
 
 ## Models
