@@ -14,7 +14,6 @@ This is a preview for Poseur, which currently including Poseur with R-50 backbon
 1. Install following packages
 ```
 pip install easydict, einops
-
 ```
 2. Follow the [MMPose instruction](mmpose_README.md) to install the project and set up the datasets (MS-COCO).
 
@@ -58,10 +57,11 @@ Name | AP | AP.5| AP.75 |download
 # Citations
 Please consider citing our papers in your publications if the project helps your research. BibTeX reference is as follows.
 ```BibTeX
-@article{mao2022poseur,
+@inproceedings{mao2022poseur,
   title={Poseur: Direct human pose regression with transformers},
   author={Mao, Weian and Ge, Yongtao and Shen, Chunhua and Tian, Zhi and Wang, Xinlong and Wang, Zhibin and Hengel, Anton van den},
-  journal={arXiv preprint arXiv:2201.07412},
+  journal = {Proceedings of the European Conference on Computer Vision {(ECCV)}},
+  month = {October},
   year={2022}
 }
 ```
