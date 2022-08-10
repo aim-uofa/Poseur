@@ -761,10 +761,10 @@ class Poseur_noise_sample(nn.Module):
             image_paths.append(img_metas[i]['image_file'])
 
             if 'bbox_score' in img_metas[i]:
-                # score[i] = np.array(img_metas[i]['bbox_score']).reshape(-1)
+                score[i] = np.array(img_metas[i]['bbox_score']).reshape(-1)
                 
                 
-                score[i] = np.array(img_metas[i]['bbox_score']).reshape(-1) + np.mean(output_regression_score[i]) + np.max(output_regression_score[i])
+                # score[i] = np.array(img_metas[i]['bbox_score']).reshape(-1) + np.mean(output_regression_score[i]) + np.max(output_regression_score[i])
             if bbox_ids is not None:
                 bbox_ids.append(img_metas[i]['bbox_id'])
 
