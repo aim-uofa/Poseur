@@ -533,3 +533,47 @@ class RenameKeys:
             key_src, key_tgt = key_pair
             results[key_tgt] = results.pop(key_src)
         return results
+
+@PIPELINES.register_module()
+class Cutout:
+    """Augmentation by informantion dropping in Cutout paradigm. Paper ref:
+    Huang et al. AID: Pushing the Performance Boundary of Human Pose Estimation
+    with Information Dropping Augmentation (arXiv:2008.07139 2020).
+
+    Args:
+        prob (float): Probability of performing cutout.
+        radius_factor (float): Size factor of cutout area.
+        num_patch (float): Number of patches to be cutout.
+    """
+
+    def __init__(self, prob=1.0, radius_factor=0.2, num_patch=1):
+
+        self.prob = prob
+        self.radius_factor = radius_factor
+        self.num_patch = num_patch
+
+    def _cutout(self, img):
+        height, width, _ = img.shape
+        img = img.reshape(height * width, -1)
+        feat_x_int = np.arange(0, width)
+        feat_y_int = np.arange(0, height)
+        feat_x_int, feat_y_int = np.meshgrid(feat_x_int, feat_y_int)
+        feat_x_int = feat_x_int.flatten()
+        feat_y_int = feat_y_int.flatten()
+        for _ in range(self.num_patch):
+            center = [np.random.rand() * width, np.random.rand() * height]
+            radius = self.radius_factor * (1 + np.random.rand(2)) * width
+            x_offset = (center[0] - feat_x_int) / radius[0]
+            y_offset = (center[1] - feat_y_int) / radius[1]
+            dis = x_offset**2 + y_offset**2
+            indexes = np.where(dis <= 1)[0]
+            img[indexes, :] = 0
+        img = img.reshape(height, width, -1)
+        return img
+
+    def __call__(self, results):
+        img = results['img']
+        if np.random.rand() < self.prob:
+            img = self._cutout(img)
+        results['img'] = img
+        return results

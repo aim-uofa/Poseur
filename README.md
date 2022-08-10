@@ -51,6 +51,7 @@ Name | AP | AP.5| AP.75 |download
 [poseur_mbv2_coco_256x192](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_mbv2_coco_256x192.py)| 71.9  | 88.9 |78.6 | [model](https://cloudstor.aarnet.edu.au/plus/s/UXr1Dn9w6ja4fM9/download)
 [poseur_mbv2_coco_256x192_12dec](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_mbv2_coco_256x192_12dec.py)| 72.3  | 88.9 |78.9 | [model](https://cloudstor.aarnet.edu.au/plus/s/sw0II7qSQDjJ88h/download)
 [poseur_w32_coco_256x192](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_w32_coco_256x192.py)| 76.8  | 91.0 |83.5 | [model](https://cloudstor.aarnet.edu.au/plus/s/xMvCnp5lb2MR7S4/download)
+[poseur_w48_coco_384x288](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_w48_coco_384x288.py)| 78.7  | 91.6 |85.1 | [model](https://cloudstor.aarnet.edu.au/plus/s/IGXy98TZlJYerNc/download)
 
 
 *Disclaimer:*
