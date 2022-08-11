@@ -24,8 +24,6 @@ from mmpose.models.losses.regression_loss import L1Loss
 from mmpose.models.losses.rle_loss import RLELoss_poseur, RLEOHKMLoss
 
 
-
-
 def fliplr_rle_regression(regression,
                           regression_score,
                           flip_pairs,
@@ -313,12 +311,6 @@ class Poseur_noise_sample(nn.Module):
                 if isinstance(mm, nn.Linear):
                     nn.init.xavier_uniform_(mm.weight, gain=0.01)
 
-        # nn.init.constant_(self.reg_branches[0][-1].bias.data[2:], -2.0)
-        # if self.as_two_stage:
-        #     bias_init = bias_init_with_prob(0.01)
-        #     for m in self.cls_branches:
-        #         nn.init.constant_(m.bias, bias_init)
-
         if self.use_heatmap_loss:
             for _, m in self.deconv_layer.named_modules():
                 if isinstance(m, nn.ConvTranspose2d):
@@ -354,9 +346,7 @@ class Poseur_noise_sample(nn.Module):
         query_embeds = None
         if not self.as_two_stage:
             query_embeds = self.query_embedding.weight
-
-        
-        
+ 
         memory, spatial_shapes, level_start_index, hs, init_reference, inter_references, \
         enc_outputs = self.transformer(
             mlvl_feats,
@@ -371,21 +361,6 @@ class Poseur_noise_sample(nn.Module):
         outputs_coords = []
         outputs_sigmas = []
 
-        # for lvl in range(hs.shape[0]):
-        #     if lvl == 0:
-        #         reference = init_reference
-        #     else:
-        #         reference = inter_references[lvl - 1]
-        #     reference = inverse_sigmoid(reference)
-        #     tmp = self.reg_branches[lvl](hs[lvl])
-        #     if reference.shape[-1] == 4:
-        #         tmp += reference
-        #     else:
-        #         assert reference.shape[-1] == 2
-        #         tmp[..., :2] += reference
-        #     outputs_coord = tmp.sigmoid()
-        #     outputs_coords.append(outputs_coord)
-
         for lvl in range(hs.shape[0]):
             if lvl == 0:
                 reference = init_reference
@@ -393,8 +368,6 @@ class Poseur_noise_sample(nn.Module):
                 reference = inter_references[lvl - 1]
             reference = inverse_sigmoid(reference)
 
-            
-            
             # hs: lvl, bs, 17, 256
             tmp = self.fc_coord_branches[lvl](hs[lvl])
             tmp[..., :2] += reference
@@ -408,8 +381,6 @@ class Poseur_noise_sample(nn.Module):
             outputs_coord = outputs_coord + delta_coord_output
             outputs_coords.append(outputs_coord)
 
-        
-        
         # [num_decoder, bs, 17, 2]
         if self.with_box_refine:
             outputs_coords = torch.stack(outputs_coords)
@@ -447,10 +418,10 @@ class Poseur_noise_sample(nn.Module):
         dec_rle_loss = self.get_dec_rle_loss(dec_output, coord_target, coord_target_weight)
         losses.update(dec_rle_loss)
 
-        if self.use_heatmap_loss:
-            hp_output = dec_output.hp
-            hp_loss = self.get_hp_loss(hp_output, hp_target, hp_target_weight)
-            losses.update(hp_loss)
+        # if self.use_heatmap_loss:
+        #     hp_output = dec_output.hp
+        #     hp_loss = self.get_hp_loss(hp_output, hp_target, hp_target_weight)
+        #     losses.update(hp_loss)
         return losses
 
     def get_enc_rle_loss(self, output, target, target_weight):
@@ -469,8 +440,6 @@ class Poseur_noise_sample(nn.Module):
         assert not isinstance(self.loss_coord_enc, nn.Sequential)
         assert target.dim() == 3 and target_weight.dim() == 3
 
-        
-        
         BATCH_SIZE = output.sigma.size(0)
         gt_uv = target.reshape(output.pred_jts.shape)
         bar_mu = (output.pred_jts - gt_uv) / output.sigma
@@ -501,10 +470,7 @@ class Poseur_noise_sample(nn.Module):
         target = target.repeat(1,self.transformer.num_noise_sample+1,1)
         target_weight = target_weight.repeat(1,self.transformer.num_noise_sample+1,1)
         
-        
-        if self.with_box_refine:
-                
-                
+        if self.with_box_refine:  
             if self.use_dec_rle_loss:
                 for i, (pred_jts, sigma) in enumerate(zip(output.pred_jts, output.sigma)):
                     output_i = EasyDict(
@@ -669,7 +635,6 @@ class Poseur_noise_sample(nn.Module):
 
         return accuracy
 
-
     def inference_model(self, x, flip_pairs=None):
         """Inference function.
 
@@ -701,33 +666,6 @@ class Poseur_noise_sample(nn.Module):
                 output_regression, output_regression_score, flip_pairs)
 
         return output_regression, output_regression_score
-
-
-    def inference_model1(self, x, flip_pairs=None):
-        """Inference function.
-
-        Returns:
-            output_regression (np.ndarray): Output regression.
-
-        Args:
-            x (torch.Tensor[N, K, 2]): Input features.
-            flip_pairs (None | list[tuple()):
-                Pairs of keypoints which are mirrored.
-        """
-        output_enc, output_dec = self.forward(x)
-        # coord_output = output["coord"]
-        coord_output = output_dec.pred_jts
-        # hp_output = output["hp"]
-
-        if coord_output.dim() == 4:
-            output = coord_output[-1]
-
-        if flip_pairs is not None:
-            output_regression = fliplr_regression(
-                output.detach().cpu().numpy(), flip_pairs)
-        else:
-            output_regression = output.detach().cpu().numpy()
-        return output_regression
 
     def decode_keypoints(self, img_metas, output_regression, output_regression_score, img_size):
         """Decode keypoints from output regression.
@@ -761,10 +699,8 @@ class Poseur_noise_sample(nn.Module):
             image_paths.append(img_metas[i]['image_file'])
 
             if 'bbox_score' in img_metas[i]:
-                score[i] = np.array(img_metas[i]['bbox_score']).reshape(-1)
-                
-                
-                # score[i] = np.array(img_metas[i]['bbox_score']).reshape(-1) + np.mean(output_regression_score[i]) + np.max(output_regression_score[i])
+                score[i] = np.array(img_metas[i]['bbox_score']).reshape(-1) 
+    
             if bbox_ids is not None:
                 bbox_ids.append(img_metas[i]['bbox_id'])
 
