@@ -77,4 +77,4 @@ Please consider citing our papers in your publications if the project helps your
 
 ## License
 
-For academic use, this project is licensed under the 2-clause BSD License. For commercial use, please contact [Chunhua Shen](mailto:chhshen@gmail.com).
+For commercial use, please contact [Chunhua Shen](mailto:chhshen@gmail.com).
