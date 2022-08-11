@@ -60,7 +60,7 @@ Name | AP | AP.5| AP.75 |download
 
 *Disclaimer:*
 
-- Due to the update of MMPose, the result of R50 is slightly higher than our original paper.
+- Due to the update of MMPose, the results are slightly different from our original paper.
 - Because the HRFormer in MMPose is different from HRFormer offical implement, we use the HRFormer offical implement instead.
 
 # Citations
