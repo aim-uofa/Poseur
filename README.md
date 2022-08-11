@@ -47,15 +47,15 @@ python demo/top_down_img_demo.py \
 
 Name | AP | AP.5| AP.75 |download
 --- |:---:|:---:|:---:|:---:
-[poseur_r50_coco_256x192](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_r50_coco_256x192.py)| 75.5  | 90.7 |82.6 | [model](https://cloudstor.aarnet.edu.au/plus/s/UXr1Dn9w6ja4fM9/download)
-[poseur_mbv2_coco_256x192](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_mbv2_coco_256x192.py)| 71.9  | 88.9 |78.6 | [model](https://cloudstor.aarnet.edu.au/plus/s/UXr1Dn9w6ja4fM9/download)
-[poseur_mbv2_coco_256x192_12dec](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_mbv2_coco_256x192_12dec.py)| 72.3  | 88.9 |78.9 | [model](https://cloudstor.aarnet.edu.au/plus/s/sw0II7qSQDjJ88h/download)
-[poseur_hrnet_w32_coco_256x192](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_w32_coco_256x192.py)| 76.8  | 91.0 |83.5 | [model](https://cloudstor.aarnet.edu.au/plus/s/xMvCnp5lb2MR7S4/download)
-[poseur_hrnet_w48_coco_384x288](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_w48_coco_384x288.py)| 78.7  | 91.6 |85.1 | [model](https://cloudstor.aarnet.edu.au/plus/s/IGXy98TZlJYerNc/download)
-[poseur_hrft_coco_256x192_3dec](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_hrft_coco_256x192_3dec.py)| 74.2  | 90.1 |81.4 | [model](https://cloudstor.aarnet.edu.au/plus/s/CpGYghZQX3mv32i/download)
-[poseur_hrfs_coco_256x192_3dec](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_hrfs_coco_256x192_3dec.py)| 76.6  | 91.0 |83.4 | [model](https://cloudstor.aarnet.edu.au/plus/s/rK2s3fdrpeP9k6l/download)
-[poseur_hrfb_coco_256x192](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_hrfb_coco_256x192.py)| 78.9  | 91.9 |85.6 | [model](https://cloudstor.aarnet.edu.au/plus/s/34udjbTr9p9Aigo/download)
-[poseur_hrfb_coco_384x288](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_hrfb_coco_384x288.py)| 79.6  | 92.1 |85.9 | [model](https://cloudstor.aarnet.edu.au/plus/s/KST3aSAlGd8PJpQ/download)
+[poseur_mobilenetv2_coco_256x192](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_mobilenetv2_coco_256x192.py)| 71.9  | 88.9 |78.6 | [model](https://cloudstor.aarnet.edu.au/plus/s/UXr1Dn9w6ja4fM9/download)
+[poseur_mobilenetv2_coco_256x192_12dec](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_mobilenetv2_coco_256x192_12dec.py)| 72.3  | 88.9 |78.9 | [model](https://cloudstor.aarnet.edu.au/plus/s/sw0II7qSQDjJ88h/download)
+[poseur_res50_coco_256x192](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_res50_coco_256x192.py)| 75.5  | 90.7 |82.6 | [model](https://cloudstor.aarnet.edu.au/plus/s/UXr1Dn9w6ja4fM9/download)
+[poseur_hrnet_w32_coco_256x192](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_hrnet_w32_coco_256x192.py)| 76.8  | 91.0 |83.5 | [model](https://cloudstor.aarnet.edu.au/plus/s/xMvCnp5lb2MR7S4/download)
+[poseur_hrnet_w48_coco_384x288](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_hrnet_w48_coco_384x288.py)| 78.7  | 91.6 |85.1 | [model](https://cloudstor.aarnet.edu.au/plus/s/IGXy98TZlJYerNc/download)
+[poseur_hrformer_tiny_coco_256x192_3dec](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_hrformer_tiny_coco_256x192_3dec.py)| 74.2  | 90.1 |81.4 | [model](https://cloudstor.aarnet.edu.au/plus/s/CpGYghZQX3mv32i/download)
+[poseur_hrformer_small_coco_256x192_3dec](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_hrformer_small_coco_256x192_3dec.py)| 76.6  | 91.0 |83.4 | [model](https://cloudstor.aarnet.edu.au/plus/s/rK2s3fdrpeP9k6l/download)
+[poseur_hrformer_big_coco_256x192](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_hrformer_big_coco_256x192.py)| 78.9  | 91.9 |85.6 | [model](https://cloudstor.aarnet.edu.au/plus/s/34udjbTr9p9Aigo/download)
+[poseur_hrformer_big_coco_384x288](configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_hrformer_big_coco_384x288.py)| 79.6  | 92.1 |85.9 | [model](https://cloudstor.aarnet.edu.au/plus/s/KST3aSAlGd8PJpQ/download)
 
 
 *Disclaimer:*
