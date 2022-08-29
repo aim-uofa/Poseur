@@ -21,7 +21,7 @@ For training on COCO, run:
 ```
 ./tools/dist_train.sh \
 configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_res50_coco_256x192.py 8 \
---work-dir work_dirs/poseur_r50_coco_256x192
+--work-dir work_dirs/poseur_res50_coco_256x192
 ```
 
 For evaluating on COCO, run the following command lines:
