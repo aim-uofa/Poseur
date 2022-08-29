@@ -1,10 +1,10 @@
 # Poseur: Direct Human Pose Regression with Transformers
 
 
-> [**Poseur: Direct Human Pose Regression with Transformers**](https://arxiv.org/pdf/2201.07412.pdf),            
-> Weian Mao\*, Yongtao Ge\*, Chunhua Shen, Zhi Tian, Xinlong Wang, Zhibin Wang, Anton van den Hengel  
-> In: European Conference on Computer Vision (ECCV), 2022   
-> *arXiv preprint ([arXiv 2201.07412](https://arxiv.org/pdf/2201.07412))*  
+> [**Poseur: Direct Human Pose Regression with Transformers**](https://arxiv.org/pdf/2201.07412.pdf),
+> Weian Mao\*, Yongtao Ge\*, Chunhua Shen, Zhi Tian, Xinlong Wang, Zhibin Wang, Anton van den Hengel
+> In: European Conference on Computer Vision (ECCV), 2022
+> *arXiv preprint ([arXiv 2201.07412](https://arxiv.org/pdf/2201.07412))*
 > (\* equal contribution)
 
 # Introduction
@@ -13,21 +13,21 @@ This is a preview for Poseur, which currently including Poseur with R-50 backbon
 # Installation & Quick Start
 1. Install following packages
 ```
-pip install easydict, einops
+pip install easydict einops
 ```
 2. Follow the [MMPose instruction](mmpose_README.md) to install the project and set up the datasets (MS-COCO).
 
 For training on COCO, run:
 ```
 ./tools/dist_train.sh \
-configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_r50_coco_256x192.py 8 \
+configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_res50_coco_256x192.py 8 \
 --work-dir work_dirs/poseur_r50_coco_256x192
 ```
 
 For evaluating on COCO, run the following command lines:
 ```
 wget https://cloudstor.aarnet.edu.au/plus/s/UXr1Dn9w6ja4fM9/download -O poseur_256x192_r50_6dec_coco.pth
-./tools/dist_test.sh configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_r50_coco_256x192.py \
+./tools/dist_test.sh configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_res50_coco_256x192.py \
     poseur_256x192_r50_6dec_coco.pth 4 \
     --eval mAP \
     --cfg-options model.filp_fuse_type=\'type2\'
@@ -36,7 +36,7 @@ wget https://cloudstor.aarnet.edu.au/plus/s/UXr1Dn9w6ja4fM9/download -O poseur_2
 For visualizing on COCO, run the following command lines:
 ```
 python demo/top_down_img_demo.py \
-    configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_r50_coco_256x192.py \
+    configs/body/2d_kpt_sview_rgb_img/poseur/coco/poseur_res50_coco_256x192.py \
     poseur_256x192_r50_6dec_coco.pth \
     --img-root tests/data/coco/ --json-file tests/data/coco/test_coco.json \
     --out-img-root vis_results_poseur
