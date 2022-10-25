@@ -9,4 +9,4 @@ pip install timm
 pip install future tensorboard
 mkdir checkpoints
 mkdir outputs
-mkdir data
+mkdir data 

@@ -35,4 +35,4 @@
 !wget https://zihao-openmmlab.obs.cn-east-3.myhuaweicloud.com/20220610-mmpose/videos/zihao_hand.mp4 -O data/zihao_hand.mp4
 
 # 行人
-!wget https://zihao-openmmlab.obs.cn-east-3.myhuaweicloud.com/20220418-mmtracking/data/mot_people_short.mp4 -O data/mot_people_short.mp4
+!wget https://zihao-openmmlab.obs.cn-east-3.myhuaweicloud.com/20220418-mmtracking/data/mot_people_short.mp4 -O data/mot_people_short.mp4 

@@ -13,4 +13,4 @@
 PORT=29500 CUDA_VISIBLE_DEVICES=0,1,2,3 ./tools/dist_train.sh configs/body/2d_kpt_sview_rgb_img/topdown_heatmap/coco/mobilenetv2_coco_256x192.py 4 --work-dir work_dirs/mobilenetv2_coco_256x192 --cfg-options data.train_dataloader.samples_per_gpu=32 data.workers_per_gpu=0
 # 2022-10-24 21:01:16,241 - mmpose - INFO - Epoch [1][50/18727]   lr: 4.945e-05, eta: 10 days, 20:21:04, time: 0.238, data_time: 0.173, memory: 709, heatmap_loss: 0.0022, acc_pose: 0.0316, loss: 0.0022
 # 2022-10-24 21:04:30,980 - mmpose - INFO - Epoch [1][50/4682]    lr: 4.945e-05, eta: 7 days, 0:44:47, time: 0.618, data_time: 0.516, memory: 2402, heatmap_loss: 0.0021, acc_pose: 0.0413, loss: 0.0021
-# 2022-10-24 21:12:07,101 - mmpose - INFO - Epoch [1][50/1171]    lr: 4.945e-05, eta: 2 days, 9:09:00, time: 0.837, data_time: 0.656, memory: 2402, heatmap_loss: 0.0021, acc_pose: 0.0482, loss: 0.0021
+# 2022-10-24 21:12:07,101 - mmpose - INFO - Epoch [1][50/1171]    lr: 4.945e-05, eta: 2 days, 9:09:00, time: 0.837, data_time: 0.656, memory: 2402, heatmap_loss: 0.0021, acc_pose: 0.0482, loss: 0.0021 

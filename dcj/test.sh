@@ -1,1 +1,1 @@
-CUDA_VISIBLE_DEVICES=3 ./tools/dist_test.sh configs/body/2d_kpt_sview_rgb_img/associative_embedding/mhp/hrnet_w48_mhp_512x512.py work_dirs/HAE_COCO.pth 1 --out test_results/AE+MHP+baseline.json --eval mAP
+CUDA_VISIBLE_DEVICES=3 ./tools/dist_test.sh configs/body/2d_kpt_sview_rgb_img/associative_embedding/mhp/hrnet_w48_mhp_512x512.py work_dirs/HAE_COCO.pth 1 --out test_results/AE+MHP+baseline.json --eval mAP 
