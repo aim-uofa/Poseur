@@ -60,7 +60,7 @@ model = dict(
     keypoint_head=dict(
         type='PoseurHead',
         in_channels=512,
-        num_queries=17,
+        num_queries=channel_cfg['dataset_joints'],
         num_reg_fcs=2,
         num_joints=channel_cfg['num_output_channels'],
         with_box_refine=True,
@@ -78,6 +78,7 @@ model = dict(
             type='PoseurTransformer',
             query_pose_emb = True,
             embed_dims = emb_dim,
+            num_joints=channel_cfg['num_output_channels'],
             encoder=dict(
                 type='DetrTransformerEncoder_zero_layer',
                 num_layers=0,
@@ -101,6 +102,7 @@ model = dict(
                 return_intermediate=True,
                 transformerlayers=dict(
                     type='DetrTransformerDecoderLayer_grouped',
+                    num_joints=channel_cfg['num_output_channels'],
                     ffn_cfgs = dict(
                         embed_dims=emb_dim,
                         ),
@@ -133,24 +135,14 @@ model = dict(
 )
 
 data_cfg = dict(
-    image_size=[192, 256],
-    heatmap_size=[48, 64],
+    image_size=[256, 256],
+    heatmap_size=[64, 64],
     num_output_channels=channel_cfg['num_output_channels'],
     num_joints=channel_cfg['dataset_joints'],
     dataset_channel=channel_cfg['dataset_channel'],
     inference_channel=channel_cfg['inference_channel'],
-    soft_nms=False,
-    # use_nms=False,
-    nms_thr=1.0,
-    oks_thr=0.9,
-    vis_thr=0.2,
-    det_bbox_thr=0.0,
-    # use_gt_bbox=True,
-    # bbox_file='',
-    use_gt_bbox=False,
-    bbox_file='data/coco/person_detection_results/'
-    'COCO_val2017_detections_AP_H_56_person.json',
-
+    use_gt_bbox=True,
+    bbox_file=None,
 )
 
 train_pipeline = [
