@@ -106,7 +106,7 @@ class Linear_with_norm(nn.Module):
 
 
 @HEADS.register_module()
-class Poseur_noise_sample(nn.Module):
+class PoseurHead(nn.Module):
     """
     rle loss for Poseur
     """

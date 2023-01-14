@@ -8,15 +8,14 @@ evaluation = dict(interval=25, metric='mAP', key_indicator='AP', rle_score=True)
 
 optimizer = dict(
     type='AdamW',
-    lr=5e-4,
-    betas=(0.9, 0.999),
-    weight_decay=0.01,
+    lr=1e-3,
+    weight_decay=1e-4,
     paramwise_cfg = dict(
         custom_keys={
-            'sampling_offsets': dict(lr_mult=0.1, decay_mult=0.01),
-            'reference_points': dict(lr_mult=0.1, decay_mult=0.01),
-            'fc_coord_output_branches': dict(lr_mult=1.0, decay_mult=0.01),
-            'fc_sigma_branches': dict(lr_mult=1.0, decay_mult=0.01),
+            # 'backbone': dict(lr_mult=0.1),
+            'sampling_offsets': dict(lr_mult=0.1),
+            'reference_points': dict(lr_mult=0.1),
+            # 'query_embed': dict(lr_mult=0.5, decay_mult=1.0),
         },
     )
 )
@@ -51,61 +50,50 @@ emb_dim = 256
 norm_cfg = dict(type='SyncBN', requires_grad=True)
 model = dict(
     type='Poseur',
-    pretrained='hrt_base.pth', # Set the path to pretrained backbone here
+    pretrained='https://download.openmmlab.com/mmpose/'
+    'pretrain_models/hrnet_w32-36af842e.pth',
     backbone=dict(
-        type='HRT',
+        type='HRNet',
+        norm_cfg = norm_cfg,
         in_channels=3,
-        norm_cfg=norm_cfg,
         extra=dict(
-            drop_path_rate=0.3,
             stage1=dict(
                 num_modules=1,
                 num_branches=1,
                 block='BOTTLENECK',
-                num_blocks=(2, ),
-                num_channels=(64, ),
-                num_heads=[2],
-                num_mlp_ratios=[4]),
+                num_blocks=(4, ),
+                num_channels=(64, )),
             stage2=dict(
                 num_modules=1,
                 num_branches=2,
-                block='TRANSFORMER_BLOCK',
-                num_blocks=(2, 2),
-                num_channels=(78, 156),
-                num_heads = [2, 4],
-                num_mlp_ratios = [4, 4],
-                num_window_sizes = [7, 7]),
+                block='BASIC',
+                num_blocks=(4, 4),
+                num_channels=(32, 64)),
             stage3=dict(
                 num_modules=4,
                 num_branches=3,
-                block='TRANSFORMER_BLOCK',
-                num_blocks=(2, 2, 2),
-                num_channels=(78, 156, 312),
-                num_heads = [2, 4, 8],
-                num_mlp_ratios = [4, 4, 4],
-                num_window_sizes = [7, 7, 7]),
+                block='BASIC',
+                num_blocks=(4, 4, 4),
+                num_channels=(32, 64, 128)),
             stage4=dict(
-                num_modules=2,
+                num_modules=3,
                 num_branches=4,
-                block='TRANSFORMER_BLOCK',
-                num_blocks=(2, 2, 2, 2),
-                num_channels=(78, 156, 312, 624),
-                num_heads = [2, 4, 8, 16],
-                num_mlp_ratios = [4, 4, 4, 4],
-                num_window_sizes = [7, 7, 7, 7],
-                multiscale_output = True,
-                )
-            )),
+                block='BASIC',
+                num_blocks=(4, 4, 4, 4),
+                num_channels=(32, 64, 128, 256),
+                multiscale_output=True,
+                )),
+    ),
     neck=dict(
         type='ChannelMapper',
-        in_channels=[78, 156, 312, 624],
+        in_channels=[32, 64, 128, 256],
         kernel_size=1,
         out_channels=emb_dim,
         act_cfg=None,
         norm_cfg=dict(type='GN', num_groups=32),
     ),
     keypoint_head=dict(
-        type='Poseur_noise_sample',
+        type='PoseurHead',
         in_channels=512,
         num_queries=17,
         num_reg_fcs=2,
@@ -122,7 +110,7 @@ model = dict(
             normalize=True,
             offset=-0.5),
         transformer=dict(
-            type='PoseurTransformer_v3',
+            type='PoseurTransformer',
             query_pose_emb = True,
             embed_dims = emb_dim,
             encoder=dict(
@@ -150,7 +138,6 @@ model = dict(
                     type='DetrTransformerDecoderLayer_grouped',
                     ffn_cfgs = dict(
                         embed_dims=emb_dim,
-                        ffn_drop=0.1,
                         ),
                     attn_cfgs=[
                         dict(
@@ -181,8 +168,8 @@ model = dict(
 )
 
 data_cfg = dict(
-    image_size=[288, 384],
-    heatmap_size=[72, 96],
+    image_size=[192, 256],
+    heatmap_size=[48, 64],
     num_output_channels=channel_cfg['num_output_channels'],
     num_joints=channel_cfg['dataset_joints'],
     dataset_channel=channel_cfg['dataset_channel'],
@@ -212,8 +199,6 @@ train_pipeline = [
     dict(
         type='TopDownGetRandomScaleRotation', rot_factor=40, scale_factor=0.5),
     dict(type='TopDownAffine'),
-    dict(type='PhotometricDistortion'),
-    dict(type='Cutout'),
     dict(type='ToTensor'),
     dict(
         type='NormalizeTensor',
@@ -261,7 +246,7 @@ test_pipeline = val_pipeline
 
 data_root = 'data/coco'
 data = dict(
-    samples_per_gpu=16,
+    samples_per_gpu=32,
     # samples_per_gpu=64,
     workers_per_gpu=8,
     val_dataloader=dict(samples_per_gpu=32),

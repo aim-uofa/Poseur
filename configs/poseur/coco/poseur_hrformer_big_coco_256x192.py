@@ -105,7 +105,7 @@ model = dict(
         norm_cfg=dict(type='GN', num_groups=32),
     ),
     keypoint_head=dict(
-        type='Poseur_noise_sample',
+        type='PoseurHead',
         in_channels=512,
         num_queries=17,
         num_reg_fcs=2,
@@ -122,7 +122,7 @@ model = dict(
             normalize=True,
             offset=-0.5),
         transformer=dict(
-            type='PoseurTransformer_v3',
+            type='PoseurTransformer',
             query_pose_emb = True,
             embed_dims = emb_dim,
             encoder=dict(

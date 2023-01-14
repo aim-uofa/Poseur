@@ -4,7 +4,7 @@ resume_from = None
 dist_params = dict(backend='nccl')
 workflow = [('train', 1)]
 checkpoint_config = dict(interval=10)
-evaluation = dict(interval=25, metric='mAP', key_indicator='AP', rle_score=True)
+evaluation = dict(interval=25, metric='PCKh', key_indicator='PCKh', rle_score=True)
 
 optimizer = dict(
     type='AdamW',
@@ -35,14 +35,10 @@ log_config = dict(
     ])
 
 channel_cfg = dict(
-    num_output_channels=17,
-    dataset_joints=17,
-    dataset_channel=[
-        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
-    ],
-    inference_channel=[
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
-    ])
+    num_output_channels=16,
+    dataset_joints=16,
+    dataset_channel=list(range(16)),
+    inference_channel=list(range(16)))
 
 emb_dim = 256
 
@@ -50,19 +46,19 @@ emb_dim = 256
 norm_cfg = dict(type='SyncBN', requires_grad=True)
 model = dict(
     type='Poseur',
-    pretrained='mmcls://mobilenet_v2',
-    backbone=dict(type='MobileNetV2',norm_cfg = norm_cfg ,widen_factor=1., out_indices=(1,2,4,7 )),
+    pretrained='torchvision://resnet50',
+    backbone=dict(type='ResNet', norm_cfg = norm_cfg, depth=50, num_stages=4, out_indices=(0, 1, 2, 3)),
     neck=dict(
         type='ChannelMapper',
         # in_channels=[128, 256, 512],
-        in_channels=[24, 32, 96, 1280],
+        in_channels=[256, 512, 1024, 2048],
         kernel_size=1,
         out_channels=emb_dim,
         act_cfg=None,
         norm_cfg=dict(type='GN', num_groups=32),
     ),
     keypoint_head=dict(
-        type='Poseur_noise_sample',
+        type='PoseurHead',
         in_channels=512,
         num_queries=17,
         num_reg_fcs=2,
@@ -79,7 +75,7 @@ model = dict(
             normalize=True,
             offset=-0.5),
         transformer=dict(
-            type='PoseurTransformer_v3',
+            type='PoseurTransformer',
             query_pose_emb = True,
             embed_dims = emb_dim,
             encoder=dict(
@@ -213,33 +209,28 @@ val_pipeline = [
 
 test_pipeline = val_pipeline
 
-data_root = 'data/coco'
+data_root = 'data/mpii'
 data = dict(
     samples_per_gpu=32,
-    # samples_per_gpu=64,
-    workers_per_gpu=8,
-    val_dataloader=dict(samples_per_gpu=32),
-    test_dataloader=dict(samples_per_gpu=32),
+    workers_per_gpu=2,
     train=dict(
-        type='TopDownCocoDataset',
-        ann_file=f'{data_root}/annotations/person_keypoints_train2017.json',
-        img_prefix=f'{data_root}/train2017/',
-        # ann_file=f'{data_root}/annotations/person_keypoints_val2017.json',
-        # img_prefix=f'{data_root}/val2017/',
+        type='TopDownMpiiDataset',
+        ann_file=f'{data_root}/annotations/mpii_train.json',
+        img_prefix=f'{data_root}/images/',
         data_cfg=data_cfg,
         pipeline=train_pipeline),
     val=dict(
-        type='TopDownCocoDataset',
-        ann_file=f'{data_root}/annotations/person_keypoints_val2017.json',
-        img_prefix=f'{data_root}/val2017/',
+        type='TopDownMpiiDataset',
+        ann_file=f'{data_root}/annotations/mpii_val.json',
+        img_prefix=f'{data_root}/images/',
         data_cfg=data_cfg,
         pipeline=val_pipeline),
     test=dict(
-        type='TopDownCocoDataset',
-        ann_file=f'{data_root}/annotations/person_keypoints_val2017.json',
-        img_prefix=f'{data_root}/val2017/',
+        type='TopDownMpiiDataset',
+        ann_file=f'{data_root}/annotations/mpii_val.json',
+        img_prefix=f'{data_root}/images/',
         data_cfg=data_cfg,
-        pipeline=val_pipeline),
+        pipeline=test_pipeline),
 )
 
 fp16 = dict(loss_scale='dynamic')

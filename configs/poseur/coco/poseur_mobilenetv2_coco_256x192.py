@@ -50,50 +50,19 @@ emb_dim = 256
 norm_cfg = dict(type='SyncBN', requires_grad=True)
 model = dict(
     type='Poseur',
-    pretrained='https://download.openmmlab.com/mmpose/'
-    'pretrain_models/hrnet_w32-36af842e.pth',
-    backbone=dict(
-        type='HRNet',
-        norm_cfg = norm_cfg,
-        in_channels=3,
-        extra=dict(
-            stage1=dict(
-                num_modules=1,
-                num_branches=1,
-                block='BOTTLENECK',
-                num_blocks=(4, ),
-                num_channels=(64, )),
-            stage2=dict(
-                num_modules=1,
-                num_branches=2,
-                block='BASIC',
-                num_blocks=(4, 4),
-                num_channels=(32, 64)),
-            stage3=dict(
-                num_modules=4,
-                num_branches=3,
-                block='BASIC',
-                num_blocks=(4, 4, 4),
-                num_channels=(32, 64, 128)),
-            stage4=dict(
-                num_modules=3,
-                num_branches=4,
-                block='BASIC',
-                num_blocks=(4, 4, 4, 4),
-                num_channels=(32, 64, 128, 256),
-                multiscale_output=True,
-                )),
-    ),
+    pretrained='mmcls://mobilenet_v2',
+    backbone=dict(type='MobileNetV2',norm_cfg = norm_cfg ,widen_factor=1., out_indices=(1,2,4,7 )),
     neck=dict(
         type='ChannelMapper',
-        in_channels=[32, 64, 128, 256],
+        # in_channels=[128, 256, 512],
+        in_channels=[24, 32, 96, 1280],
         kernel_size=1,
         out_channels=emb_dim,
         act_cfg=None,
         norm_cfg=dict(type='GN', num_groups=32),
     ),
     keypoint_head=dict(
-        type='Poseur_noise_sample',
+        type='PoseurHead',
         in_channels=512,
         num_queries=17,
         num_reg_fcs=2,
@@ -110,7 +79,7 @@ model = dict(
             normalize=True,
             offset=-0.5),
         transformer=dict(
-            type='PoseurTransformer_v3',
+            type='PoseurTransformer',
             query_pose_emb = True,
             embed_dims = emb_dim,
             encoder=dict(

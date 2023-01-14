@@ -139,3 +139,4 @@ ckpts/
 vis_results
 vis_results_poseur
 scripts
+configs/poseur_wholebody

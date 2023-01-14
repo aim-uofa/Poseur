@@ -34,7 +34,6 @@ class TopDownGetBboxCenterScale:
         self.padding = padding
 
     def __call__(self, results):
-
         if 'center' in results and 'scale' in results:
             warnings.warn(
                 'Use the "center" and "scale" that already exist in the data '
@@ -282,7 +281,8 @@ class TopDownAffine:
 
     def __call__(self, results):
         image_size = results['ann_info']['image_size']
-
+        # import pdb
+        # pdb.set_trace()
         img = results['img']
         joints_3d = results['joints_3d']
         joints_3d_visible = results['joints_3d_visible']

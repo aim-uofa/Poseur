@@ -8,14 +8,15 @@ evaluation = dict(interval=25, metric='mAP', key_indicator='AP', rle_score=True)
 
 optimizer = dict(
     type='AdamW',
-    lr=1e-3,
-    weight_decay=1e-4,
+    lr=5e-4,
+    betas=(0.9, 0.999),
+    weight_decay=0.01,
     paramwise_cfg = dict(
         custom_keys={
-            # 'backbone': dict(lr_mult=0.1),
-            'sampling_offsets': dict(lr_mult=0.1),
-            'reference_points': dict(lr_mult=0.1),
-            # 'query_embed': dict(lr_mult=0.5, decay_mult=1.0),
+            'sampling_offsets': dict(lr_mult=0.1, decay_mult=0.01),
+            'reference_points': dict(lr_mult=0.1, decay_mult=0.01),
+            'fc_coord_output_branches': dict(lr_mult=1.0, decay_mult=0.01),
+            'fc_sigma_branches': dict(lr_mult=1.0, decay_mult=0.01),
         },
     )
 )
@@ -50,50 +51,61 @@ emb_dim = 256
 norm_cfg = dict(type='SyncBN', requires_grad=True)
 model = dict(
     type='Poseur',
-    pretrained='https://download.openmmlab.com/mmpose/'
-    'pretrain_models/hrnet_w48-8ef0771d.pth',
+    pretrained='hrt_base.pth', # Set the path to pretrained backbone here
     backbone=dict(
-        type='HRNet',
-        norm_cfg = norm_cfg,
+        type='HRT',
         in_channels=3,
+        norm_cfg=norm_cfg,
         extra=dict(
+            drop_path_rate=0.3,
             stage1=dict(
                 num_modules=1,
                 num_branches=1,
                 block='BOTTLENECK',
-                num_blocks=(4, ),
-                num_channels=(64, )),
+                num_blocks=(2, ),
+                num_channels=(64, ),
+                num_heads=[2],
+                num_mlp_ratios=[4]),
             stage2=dict(
                 num_modules=1,
                 num_branches=2,
-                block='BASIC',
-                num_blocks=(4, 4),
-                num_channels=(48, 96)),
+                block='TRANSFORMER_BLOCK',
+                num_blocks=(2, 2),
+                num_channels=(78, 156),
+                num_heads = [2, 4],
+                num_mlp_ratios = [4, 4],
+                num_window_sizes = [7, 7]),
             stage3=dict(
                 num_modules=4,
                 num_branches=3,
-                block='BASIC',
-                num_blocks=(4, 4, 4),
-                num_channels=(48, 96, 192)),
+                block='TRANSFORMER_BLOCK',
+                num_blocks=(2, 2, 2),
+                num_channels=(78, 156, 312),
+                num_heads = [2, 4, 8],
+                num_mlp_ratios = [4, 4, 4],
+                num_window_sizes = [7, 7, 7]),
             stage4=dict(
-                num_modules=3,
+                num_modules=2,
                 num_branches=4,
-                block='BASIC',
-                num_blocks=(4, 4, 4, 4),
-                num_channels=(48, 96, 192, 384),
-                multiscale_output=True,
-                )),
-    ),
+                block='TRANSFORMER_BLOCK',
+                num_blocks=(2, 2, 2, 2),
+                num_channels=(78, 156, 312, 624),
+                num_heads = [2, 4, 8, 16],
+                num_mlp_ratios = [4, 4, 4, 4],
+                num_window_sizes = [7, 7, 7, 7],
+                multiscale_output = True,
+                )
+            )),
     neck=dict(
         type='ChannelMapper',
-        in_channels=[48, 96, 192, 384],
+        in_channels=[78, 156, 312, 624],
         kernel_size=1,
         out_channels=emb_dim,
         act_cfg=None,
         norm_cfg=dict(type='GN', num_groups=32),
     ),
     keypoint_head=dict(
-        type='Poseur_noise_sample',
+        type='PoseurHead',
         in_channels=512,
         num_queries=17,
         num_reg_fcs=2,
@@ -110,7 +122,7 @@ model = dict(
             normalize=True,
             offset=-0.5),
         transformer=dict(
-            type='PoseurTransformer_v3',
+            type='PoseurTransformer',
             query_pose_emb = True,
             embed_dims = emb_dim,
             encoder=dict(
@@ -249,7 +261,7 @@ test_pipeline = val_pipeline
 
 data_root = 'data/coco'
 data = dict(
-    samples_per_gpu=32,
+    samples_per_gpu=16,
     # samples_per_gpu=64,
     workers_per_gpu=8,
     val_dataloader=dict(samples_per_gpu=32),

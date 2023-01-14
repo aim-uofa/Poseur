@@ -8,15 +8,14 @@ evaluation = dict(interval=25, metric='mAP', key_indicator='AP', rle_score=True)
 
 optimizer = dict(
     type='AdamW',
-    lr=5e-4,
-    betas=(0.9, 0.999),
-    weight_decay=0.01,
+    lr=1e-3,
+    weight_decay=1e-4,
     paramwise_cfg = dict(
         custom_keys={
+            # 'backbone': dict(lr_mult=0.1),
             'sampling_offsets': dict(lr_mult=0.1),
             'reference_points': dict(lr_mult=0.1),
-            'neck': dict(lr_mult=2.0, decay_mult=0.01),
-            'keypoint_head': dict(lr_mult=2.0, decay_mult=0.01),
+            # 'query_embed': dict(lr_mult=0.5, decay_mult=1.0),
         },
     )
 )
@@ -51,61 +50,19 @@ emb_dim = 256
 norm_cfg = dict(type='SyncBN', requires_grad=True)
 model = dict(
     type='Poseur',
-    pretrained='hrt_tiny.pth', # Set the path to pretrained backbone here
-    backbone=dict(
-        type='HRT',
-        in_channels=3,
-        norm_cfg=norm_cfg,
-        extra=dict(
-            drop_path_rate=0.1,
-            stage1=dict(
-                num_modules=1,
-                num_branches=1,
-                block='BOTTLENECK',
-                num_blocks=(2, ),
-                num_channels=(64, ),
-                num_heads=[2],
-                num_mlp_ratios=[4]),
-            stage2=dict(
-                num_modules=1,
-                num_branches=2,
-                block='TRANSFORMER_BLOCK',
-                num_blocks=(2, 2),
-                num_channels=(18, 36),
-                num_heads = [1, 2],
-                num_mlp_ratios = [4, 4],
-                num_window_sizes = [7, 7]),
-            stage3=dict(
-                num_modules=3,
-                num_branches=3,
-                block='TRANSFORMER_BLOCK',
-                num_blocks=(2, 2, 2),
-                num_channels=(18, 36, 72),
-                num_heads = [1, 2, 4],
-                num_mlp_ratios = [4, 4, 4],
-                num_window_sizes = [7, 7, 7]),
-            stage4=dict(
-                num_modules=2,
-                num_branches=4,
-                block='TRANSFORMER_BLOCK',
-                num_blocks=(2, 2, 2, 2),
-                num_channels=(18, 36, 72, 144),
-                num_heads = [1, 2, 4, 8],
-                num_mlp_ratios = [4, 4, 4, 4],
-                num_window_sizes = [7, 7, 7, 7],
-                multiscale_output=True,
-                )
-            )),
+    pretrained='mmcls://mobilenet_v2',
+    backbone=dict(type='MobileNetV2',norm_cfg = norm_cfg ,widen_factor=1., out_indices=(1,2,4,7 )),
     neck=dict(
         type='ChannelMapper',
-        in_channels=[18, 36, 72, 144],
+        # in_channels=[128, 256, 512],
+        in_channels=[24, 32, 96, 1280],
         kernel_size=1,
         out_channels=emb_dim,
         act_cfg=None,
         norm_cfg=dict(type='GN', num_groups=32),
     ),
     keypoint_head=dict(
-        type='Poseur_noise_sample',
+        type='PoseurHead',
         in_channels=512,
         num_queries=17,
         num_reg_fcs=2,
@@ -122,7 +79,7 @@ model = dict(
             normalize=True,
             offset=-0.5),
         transformer=dict(
-            type='PoseurTransformer_v3',
+            type='PoseurTransformer',
             query_pose_emb = True,
             embed_dims = emb_dim,
             encoder=dict(
@@ -144,7 +101,7 @@ model = dict(
                     operation_order=('self_attn', 'norm', 'ffn', 'norm'))),
             decoder=dict(
                 type='DeformableDetrTransformerDecoder',
-                num_layers=3,
+                num_layers=12,
                 return_intermediate=True,
                 transformerlayers=dict(
                     type='DetrTransformerDecoderLayer_grouped',

@@ -25,6 +25,7 @@ import copy
 import warnings
 from mmcv.cnn import build_activation_layer, build_norm_layer, xavier_init
 
+
 def point_sample(input, point_coords, **kwargs):
     """
     A wrapper around :function:`torch.nn.functional.grid_sample` to support 3D point_coords tensors.
@@ -47,6 +48,7 @@ def point_sample(input, point_coords, **kwargs):
     if add_dim:
         output = output.squeeze(3)
     return output
+
 
 def nlc_to_nchw(x, hw_shape):
     """Convert [N, L, C] shape tensor to [N, C, H, W] shape tensor.
@@ -438,6 +440,7 @@ class DetrTransformerEncoder_zero_layer():
         query = query + query_pos
         return query
 
+
 @TRANSFORMER_LAYER.register_module()
 class DetrTransformerDecoderLayer_grouped(BaseTransformerLayer):
     def __init__(self,
@@ -448,7 +451,7 @@ class DetrTransformerDecoderLayer_grouped(BaseTransformerLayer):
                  act_cfg=dict(type='ReLU', inplace=True),
                  norm_cfg=dict(type='LN'),
                  ffn_num_fcs=2,
-                 num_joints = 17,
+                 num_joints=17,
                  **kwargs):
         super(DetrTransformerDecoderLayer_grouped, self).__init__(
             attn_cfgs=attn_cfgs,
@@ -494,10 +497,9 @@ class DetrTransformerDecoderLayer_grouped(BaseTransformerLayer):
 
         for layer in self.operation_order:
             if layer == 'self_attn':
-                assert query.size(0)%self.num_joints == 0
-                num_group = query.size(0)//self.num_joints
+                assert query.size(0) % self.num_joints == 0
+                num_group = query.size(0) // self.num_joints
                 bs = query.size(1)
-
                 temp_query = rearrange(query, '(g k) b c -> k (g b) c', 
                             g=num_group, k=self.num_joints)
                 temp_identity = rearrange(identity, '(g k) b c -> k (g b) c', 
@@ -545,11 +547,13 @@ class DetrTransformerDecoderLayer_grouped(BaseTransformerLayer):
                 query = self.ffns[ffn_index](
                     query, identity if self.pre_norm else None)
                 ffn_index += 1
+                
         if 'cross_attn' not in self.operation_order:
             query = query + value.sum()*0
 
         return query
-        
+
+
 @TRANSFORMER_LAYER_SEQUENCE.register_module()
 class DeformableDetrTransformerDecoder(TransformerLayerSequence):
     """Implements the decoder in DETR transformer.
@@ -618,6 +622,7 @@ class DeformableDetrTransformerDecoder(TransformerLayerSequence):
 
         return output, reference_points
 
+
 class Linear_with_norm(nn.Module):
     def __init__(self, in_channel, out_channel, bias=True, norm=True):
         super(Linear_with_norm, self).__init__()
@@ -636,6 +641,8 @@ class Linear_with_norm(nn.Module):
         if self.bias:
             y = y + self.linear.bias
         return y
+
+
 @TRANSFORMER.register_module()
 class Transformer(BaseModule):
     """Implements the DETR transformer.
@@ -713,8 +720,10 @@ class Transformer(BaseModule):
         out_dec = out_dec.transpose(1, 2)
         memory = memory.permute(1, 2, 0).reshape(bs, c, h, w)
         return out_dec, memory
+
+
 @TRANSFORMER.register_module()
-class PoseurTransformer_v3(Transformer):
+class PoseurTransformer(Transformer):
     """ add noise training """
 
     def __init__(self,
@@ -726,16 +735,16 @@ class PoseurTransformer_v3(Transformer):
                  use_soft_argmax_def=False,
                  proposal_feature='backbone_s', # or encoder_memory
                  image_size=[192, 256],
-                 init_q_sigmoid = False,
-                 soft_arg_stride = 4,
-                 add_feat_2_query = False,
-                 query_pose_emb = True,
-                 num_noise_sample = 3,
-                 num_noise_point = 4,
-                 noise_sigma = 0.2,
-                 embed_dims = 256,
+                 init_q_sigmoid=False,
+                 soft_arg_stride=4,
+                 add_feat_2_query=False,
+                 query_pose_emb=True,
+                 num_noise_sample=3,
+                 num_noise_point=4,
+                 noise_sigma=0.2,
+                 embed_dims=256,
                  **kwargs):
-        super(PoseurTransformer_v3, self).__init__(**kwargs)
+        super(PoseurTransformer, self).__init__(**kwargs)
         assert query_pose_emb == True
         self.num_noise_sample = num_noise_sample
         self.num_noise_point = num_noise_point
@@ -748,7 +757,7 @@ class PoseurTransformer_v3(Transformer):
             self.embed_dims = self.encoder.embed_dims
         except:
             self.embed_dims = embed_dims
-        self.num_joints = 17
+        self.num_joints = num_joints
         self.use_soft_argmax = use_soft_argmax
         self.use_soft_argmax_def = use_soft_argmax_def
         assert not (self.use_soft_argmax&self.use_soft_argmax_def)
@@ -784,7 +793,7 @@ class PoseurTransformer_v3(Transformer):
                 self.pos_trans = nn.Linear(self.embed_dims * 2,
                                         self.embed_dims)
                 self.pos_trans_norm = nn.LayerNorm(self.embed_dims)
-                self.pos_embed = nn.Embedding(17,self.embed_dims)
+                self.pos_embed = nn.Embedding(self.num_joints, self.embed_dims)
             else:
                 self.pos_trans = nn.Linear(self.embed_dims * 2,
                                         self.embed_dims * 2)
@@ -954,19 +963,20 @@ class PoseurTransformer_v3(Transformer):
             self.prior.covariance_matrix = self.prior.covariance_matrix.to(DEVICE)
             self.prior.precision_matrix = self.prior.precision_matrix.to(DEVICE)
         reference_points = reference_points.clone().detach()
-        bs,k,_ = reference_points.shape
-        reference_points = reference_points[:,None].repeat(1,self.num_noise_sample,1,1)
+        bs, k, _ = reference_points.shape
+        reference_points = reference_points[:,None].repeat(1, self.num_noise_sample, 1, 1)
 
         offset_noise = self.prior.sample((bs, self.num_noise_sample, self.num_noise_point))
-        offset_noise = offset_noise.clip(-1,1)
+        offset_noise = offset_noise.clip(-1, 1)
 
-        rand_index = torch.randperm(self.num_noise_sample*17,device=reference_points.device)[:self.num_noise_point*self.num_noise_sample]
-        rand_index = rand_index[None,:,None].repeat(bs,1,2)
+        rand_index = torch.randperm(self.num_noise_sample * self.num_joints, 
+                            device=reference_points.device)[:self.num_noise_point * self.num_noise_sample]
+        rand_index = rand_index[None, :, None].repeat(bs, 1, 2)
         reference_points = rearrange(reference_points, 'b s k o -> b (s k) o')
         offset_noise = rearrange(offset_noise, 'b s k o -> b (s k) o')
-        sampled_ref_point = torch.gather(reference_points,1,rand_index)
+        sampled_ref_point = torch.gather(reference_points, 1, rand_index)
         sampled_ref_point = sampled_ref_point + offset_noise
-        sampled_ref_point = sampled_ref_point.clip(-0.7,1.7)
+        sampled_ref_point = sampled_ref_point.clip(-0.7, 1.7)
         # reference_points_debug = reference_points.clone() #TODO remove this when unuse
         reference_points = reference_points.scatter_(1, rand_index, sampled_ref_point) 
         # reference_points = rearrange(reference_points, 'b (s k) o -> b s k o', 
@@ -974,7 +984,7 @@ class PoseurTransformer_v3(Transformer):
 
         return reference_points
 
-    @force_fp32(apply_to=('mlvl_feats','query_embed','mlvl_pos_embeds'))
+    @force_fp32(apply_to=('mlvl_feats', 'query_embed', 'mlvl_pos_embeds'))
     def forward(self,
                 mlvl_feats,
                 mlvl_masks,
@@ -1081,12 +1091,12 @@ class PoseurTransformer_v3(Transformer):
             sigma=sigma,
             maxvals=scores.float(),
         )
-        
+
         # reference_points = (pred_jts.detach()).clip(0, 1)
         if self.training:
             reference_points = pred_jts.detach()
             reference_points_gus = self.ref_po_gua(reference_points)
-            reference_points = torch.cat([reference_points,reference_points_gus],dim = 1)
+            reference_points = torch.cat([reference_points, reference_points_gus], dim=1)
             reference_points_cliped = reference_points.clip(0, 1)
         else:
             reference_points = pred_jts.detach()
@@ -1098,14 +1108,15 @@ class PoseurTransformer_v3(Transformer):
         if self.add_feat_2_query:
             query_feat = point_sample(point_sample_feat, init_reference_out, align_corners=False).permute(0, 2, 1)
             reference_points_pos_embed = reference_points_pos_embed + query_feat
-        query_pos_emb = torch.cat([pred_jts_pos_embed,reference_points_pos_embed], dim = 2)
+        query_pos_emb = torch.cat([pred_jts_pos_embed, reference_points_pos_embed], dim=2)
         pos_trans_out = self.pos_trans_norm(self.pos_trans(query_pos_emb))
 
         query = pos_trans_out
+
         if self.training:
-            query_pos = self.pos_embed.weight.clone().repeat(bs,self.num_noise_sample+1,1).contiguous()
+            query_pos = self.pos_embed.weight.clone().repeat(bs, self.num_noise_sample + 1,1).contiguous()
         else:
-            query_pos = self.pos_embed.weight.clone().repeat(bs,1,1).contiguous()
+            query_pos = self.pos_embed.weight.clone().repeat(bs, 1, 1).contiguous()
 
         # decoder
         query = query.permute(1, 0, 2)
