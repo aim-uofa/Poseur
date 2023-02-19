@@ -46,4 +46,6 @@ def build_mesh_model(cfg):
 
 def build_transformer(cfg, default_args=None):
     """Builder for Transformer."""
+    if cfg is None:
+        return None
     return build_from_cfg(cfg, TRANSFORMER, default_args)

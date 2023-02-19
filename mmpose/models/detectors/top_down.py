@@ -46,7 +46,8 @@ class TopDown(BasePose):
         self.fp16_enabled = False
 
         self.backbone = builder.build_backbone(backbone)
-
+        import pdb
+        pdb.set_trace()
         self.train_cfg = train_cfg
         self.test_cfg = test_cfg
 

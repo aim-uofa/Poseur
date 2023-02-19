@@ -26,6 +26,7 @@ class DeepposeRegressionHead(nn.Module):
     def __init__(self,
                  in_channels,
                  num_joints,
+                 is_3d=False,
                  loss_keypoint=None,
                  out_sigma=False,
                  train_cfg=None,
@@ -43,9 +44,19 @@ class DeepposeRegressionHead(nn.Module):
         self.out_sigma = out_sigma
 
         if out_sigma:
-            self.fc = nn.Linear(self.in_channels, self.num_joints * 4)
+            if is_3d:
+                self.fc = nn.Linear(self.in_channels, self.num_joints * 6)
+            else:
+                self.fc = nn.Linear(self.in_channels, self.num_joints * 4)
         else:
-            self.fc = nn.Linear(self.in_channels, self.num_joints * 2)
+            if is_3d:
+                self.fc = nn.Linear(self.in_channels, self.num_joints * 3)
+            else:
+                self.fc = nn.Linear(self.in_channels, self.num_joints * 2)
+
+        self.is_3d = is_3d
+        if is_3d:
+            self.root_idx = 0
 
     def forward(self, x):
         """Forward function."""
@@ -57,9 +68,19 @@ class DeepposeRegressionHead(nn.Module):
         output = self.fc(x)
         N, C = output.shape
         if self.out_sigma:
-            return output.reshape([N, C // 4, 4])
+            if self.is_3d:
+                pred_jts, pred_sigma = output.reshape([N, C // 4, 6]).split(dim=-1)
+                if not self.training:
+                    pred_jts[:, :, 2] = pred_jts[:, :, 2] - pred_jts[:, self.root_idx:self.root_idx + 1, 2]
+                    
+                return torch.cat([pred_jts, pred_sigma], dim=-1)
+            else:
+                return output.reshape([N, C // 4, 4])
         else:
-            return output.reshape([N, C // 2, 2])
+            if self.is_3d:
+                return output.reshape([N, C // 2, 3])
+            else:
+                return output.reshape([N, C // 2, 2])
 
     def get_loss(self, output, target, target_weight):
         """Calculate top-down keypoint loss.

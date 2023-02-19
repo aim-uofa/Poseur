@@ -18,36 +18,41 @@ class RealNVP(nn.Module):
     """
 
     @staticmethod
-    def get_scale_net():
+    def get_scale_net(in_channels):
         """Get the scale model in a single invertable mapping."""
         return nn.Sequential(
-            nn.Linear(2, 64), nn.LeakyReLU(), nn.Linear(64, 64),
-            nn.LeakyReLU(), nn.Linear(64, 2), nn.Tanh())
+            nn.Linear(in_channels, 64), nn.LeakyReLU(), nn.Linear(64, 64),
+            nn.LeakyReLU(), nn.Linear(64, in_channels), nn.Tanh())
 
     @staticmethod
-    def get_trans_net():
+    def get_trans_net(in_channels):
         """Get the translation model in a single invertable mapping."""
         return nn.Sequential(
-            nn.Linear(2, 64), nn.LeakyReLU(), nn.Linear(64, 64),
-            nn.LeakyReLU(), nn.Linear(64, 2))
-
+            nn.Linear(in_channels, 64), nn.LeakyReLU(), nn.Linear(64, 64),
+            nn.LeakyReLU(), nn.Linear(64, in_channels))
     @property
     def prior(self):
         """The prior distribution."""
         return distributions.MultivariateNormal(self.loc, self.cov)
 
-    def __init__(self):
+    def __init__(self, in_channels=2):
         super(RealNVP, self).__init__()
+        self.register_buffer('loc', torch.zeros(in_channels))
+        self.register_buffer('cov', torch.eye(in_channels))
 
-        self.register_buffer('loc', torch.zeros(2))
-        self.register_buffer('cov', torch.eye(2))
-        self.register_buffer(
-            'mask', torch.tensor([[0, 1], [1, 0]] * 3, dtype=torch.float32))
+        if in_channels == 3:
+            self.register_buffer(
+                'mask', torch.tensor([[0, 0, 1], [1, 1, 0]] * 3, dtype=torch.float32))
+        elif in_channels == 2:
+            self.register_buffer(
+                'mask', torch.tensor([[0, 1], [1, 0]] * 3, dtype=torch.float32))
+        else:
+            raise NotImplementedError
 
         self.s = torch.nn.ModuleList(
-            [self.get_scale_net() for _ in range(len(self.mask))])
+            [self.get_scale_net(in_channels) for _ in range(len(self.mask))])
         self.t = torch.nn.ModuleList(
-            [self.get_trans_net() for _ in range(len(self.mask))])
+            [self.get_trans_net(in_channels) for _ in range(len(self.mask))])
         self.init_weights()
 
     def init_weights(self):

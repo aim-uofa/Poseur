@@ -50,6 +50,8 @@ class GetRootCenteredPose:
         self.visible_item = visible_item
 
     def __call__(self, results):
+        # import pdb
+        # pdb.set_trace()
         assert self.item in results
         joints = results[self.item]
         root_idx = self.root_index

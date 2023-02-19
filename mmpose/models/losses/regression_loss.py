@@ -33,14 +33,15 @@ class RLELoss(nn.Module):
                  use_target_weight=False,
                  size_average=True,
                  residual=True,
-                 q_dis='laplace'):
+                 q_dis='laplace',
+                #  enable_3d_rle=False,
+                 ):
         super(RLELoss, self).__init__()
         self.size_average = size_average
         self.use_target_weight = use_target_weight
         self.residual = residual
         self.q_dis = q_dis
-
-        self.flow_model = RealNVP()
+        self.flow_model = RealNVP(in_channels=2)
 
     def forward(self, output, target, target_weight=None):
         """Forward function.
@@ -80,6 +81,109 @@ class RLELoss(nn.Module):
         else:
             loss = nf_loss
 
+        # if self.enable_3d_rle:
+        if self.use_target_weight:
+            assert target_weight is not None
+            loss *= target_weight
+
+        if self.size_average:
+            loss /= len(loss)
+
+        return loss.sum()
+
+
+
+
+@LOSSES.register_module()
+class RLELoss3D(nn.Module):
+    """RLE Loss.
+
+    `Human Pose Regression With Residual Log-Likelihood Estimation
+    arXiv: <https://arxiv.org/abs/2107.11291>`_.
+
+    Code is modified from `the official implementation
+    <https://github.com/Jeff-sjtu/res-loglikelihood-regression>`_.
+
+    Args:
+        use_target_weight (bool): Option to use weighted MSE loss.
+            Different joint types may have different target weights.
+        size_average (bool): Option to average the loss by the batch_size.
+        residual (bool): Option to add L1 loss and let the flow
+            learn the residual error distribution.
+        q_dis (string): Option for the identity Q(error) distribution,
+            Options: "laplace" or "gaussian"
+    """
+
+    def __init__(self,
+                 use_target_weight=False,
+                 size_average=True,
+                 residual=True,
+                 q_dis='laplace',
+                #  enable_3d_rle=False,
+                 ):
+        super(RLELoss3D, self).__init__()
+        self.size_average = size_average
+        self.use_target_weight = use_target_weight
+        self.residual = residual
+        self.q_dis = q_dis
+        # self.enable_3d_rle = enable_3d_rle
+        self.flow_model_3d = RealNVP(in_channels=3)
+        self.flow_model_2d = RealNVP(in_channels=2)
+
+    def forward(self, output, target, target_weight=None):
+        """Forward function.
+
+        Note:
+            - batch_size: N
+            - num_keypoints: K
+            - dimension of keypoints: D (D=3)
+
+        Args:
+            output (torch.Tensor[N, K, D*3]): Output regression,
+                    including coords and sigmas.
+            target (torch.Tensor[N, K, D]): Target regression.
+            target_weight (torch.Tensor[N, K, D]):
+                Weights across different joint types.
+        """
+        pred = output[:, :, :3]
+        sigma = output[:, :, 3:6].sigmoid()
+
+        error = (pred - target) / (sigma + 1e-9)
+        error = error.reshape(-1, 3)
+        error_3d = error_3d[target_weight > 0]
+        error_2d = error_3d[target_weight < 1][:, :, :2]
+
+        import pdb
+        pdb.set_trace()
+
+        gt_3d_mask = target_weight[:, :, 2].reshape(-1)
+
+        # (B, K, 3)
+        log_phi_3d = self.flow_model_3d.log_prob(error_3d.reshape(-1, 3))
+        log_phi_2d = self.flow_model_2d.log_prob(error_2d.reshape(-1, 2))
+
+        log_phi = torch.zeros_like(error[:, 0])
+        log_phi[gt_3d_mask > 0] = log_phi_3d
+        log_phi[gt_3d_mask < 1] = log_phi_2d
+
+        log_phi = log_phi.reshape(target.shape[0], target.shape[1], 1)
+        log_sigma = torch.log(sigma).reshape(target.shape[0], target.shape[1],
+                                             2)
+        nf_loss = log_sigma - log_phi
+
+        if self.residual:
+            assert self.q_dis in ['laplace', 'gaussian', 'strict']
+            if self.q_dis == 'laplace':
+                loss_q = torch.log(sigma * 2) + torch.abs(error)
+            else:
+                loss_q = torch.log(
+                    sigma * math.sqrt(2 * math.pi)) + 0.5 * error**2
+
+            loss = nf_loss + loss_q
+        else:
+            loss = nf_loss
+
+        # if self.enable_3d_rle:
         if self.use_target_weight:
             assert target_weight is not None
             loss *= target_weight

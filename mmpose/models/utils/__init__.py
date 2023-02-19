@@ -8,17 +8,26 @@ from .smpl import SMPL
 from .tcformer_utils import (TCFormerDynamicBlock, TCFormerRegularBlock,
                              TokenConv, cluster_dpc_knn, merge_tokens,
                              token2map, token_interp)
-from .transformer import (PatchEmbed, PatchMerging, nchw_to_nlc, nlc_to_nchw, 
-                            PoseurTransformer, DetrTransformerEncoder_zero_layer,
-                            DeformableDetrTransformerDecoder, DetrTransformerDecoderLayer_grouped)
+from .transformer import (PatchEmbed,
+                            PatchMerging, 
+                            nchw_to_nlc,
+                            nlc_to_nchw, 
+                            PoseurTransformer, 
+                            Poseur3DTransformer, 
+                            DetrTransformerEncoder_zero_layer,
+                            # DeformableDetrTransformerDecoder, 
+                            # DetrTransformerDecoderLayer,
+                            DetrTransformerDecoderLayer_grouped)
 
-from .positional_encoding import (LearnedPositionalEncoding,
-                                  SinePositionalEncoding)
+# from .positional_encoding import (LearnedPositionalEncoding,
+#                                   SinePositionalEncoding)
 
 __all__ = [
     'SMPL', 'PatchEmbed', 'nchw_to_nlc', 'nlc_to_nchw', 'pvt_convert',
     'PatchMerging', 'batch_rodrigues', 'quat_to_rotmat', 'rot6d_to_rotmat',
     'resize', 'RealNVP', 'torch_meshgrid_ij', 'token2map', 'TokenConv',
     'TCFormerRegularBlock', 'TCFormerDynamicBlock', 'cluster_dpc_knn',
-    'merge_tokens', 'token_interp', 'tcformer_convert'
+    'merge_tokens', 'token_interp', 'tcformer_convert',
+    'PoseurTransformer', 'Poseur3DTransformer',
+    # 'DetrTransformerDecoderLayer'
 ]

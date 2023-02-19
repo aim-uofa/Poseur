@@ -66,6 +66,11 @@ class Kpt3dSviewKpt2dDataset(Dataset, metaclass=ABCMeta):
 
         self.load_config(self.data_cfg)
 
+        # import pdb
+        # pdb.set_trace()
+        if 'image_size' in data_cfg:
+            self.ann_info['image_size'] = np.array(data_cfg['image_size'])
+            
         self.ann_info['num_joints'] = data_cfg['num_joints']
         assert self.ann_info['num_joints'] == dataset_info.keypoint_num
         self.ann_info['flip_pairs'] = dataset_info.flip_pairs

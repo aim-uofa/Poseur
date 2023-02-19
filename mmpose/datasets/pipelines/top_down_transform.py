@@ -261,6 +261,43 @@ class TopDownGetRandomScaleRotation:
         return results
 
 
+def _construct_rotation_matrix(rot, size=3):
+    """Construct the in-plane rotation matrix.
+    Args:
+        rot (float): Rotation angle (degree).
+        size (int): The size of the rotation matrix.
+            Candidate Values: 2, 3. Defaults to 3.
+    Returns:
+        rot_mat (np.ndarray([size, size]): Rotation matrix.
+    """
+    rot_mat = np.eye(size, dtype=np.float32)
+    if rot != 0:
+        rot_rad = np.deg2rad(rot)
+        sn, cs = np.sin(rot_rad), np.cos(rot_rad)
+        rot_mat[0, :2] = [cs, -sn]
+        rot_mat[1, :2] = [sn, cs]
+
+    return rot_mat
+
+def _rotate_joints_3d(joints_3d, rot):
+    """Rotate the 3D joints in the local coordinates.
+    Notes:
+        Joints number: K
+    Args:
+        joints_3d (np.ndarray([K, 3])): Coordinates of keypoints.
+        rot (float): Rotation angle (degree).
+    Returns:
+        joints_3d_rotated
+    """
+    # in-plane rotation
+    # 3D joints are rotated counterclockwise,
+    # so the rot angle is inversed.
+    rot_mat = _construct_rotation_matrix(-rot, 3)
+
+    joints_3d_rotated = np.einsum('ij,kj->ki', rot_mat, joints_3d)
+    joints_3d_rotated = joints_3d_rotated.astype('float32')
+    return joints_3d_rotated
+
 @PIPELINES.register_module()
 class TopDownAffine:
     """Affine transform the image to make input.
@@ -280,12 +317,17 @@ class TopDownAffine:
         self.use_udp = use_udp
 
     def __call__(self, results):
+        import pdb
+        pdb.set_trace()
         image_size = results['ann_info']['image_size']
-        # import pdb
-        # pdb.set_trace()
         img = results['img']
         joints_3d = results['joints_3d']
         joints_3d_visible = results['joints_3d_visible']
+
+        if 'joints_4d' in results.keys():
+            joints_4d = results['joints_4d']
+            joints_4d_visible = results['joints_4d_visible']
+
         c = results['center']
         s = results['scale']
         r = results['rotation']
@@ -327,9 +369,17 @@ class TopDownAffine:
                     joints_3d[i,
                               0:2] = affine_transform(joints_3d[i, 0:2], trans)
 
+                if 'joints_4d' in results.keys() and joints_4d_visible[i, 0] > 0.0:
+                    joints_4d[i, 0:3] = _rotate_joints_3d(joints_4d[:, :3], r)
+
         results['img'] = img
         results['joints_3d'] = joints_3d
         results['joints_3d_visible'] = joints_3d_visible
+
+        if 'joints_4d' in results.keys():
+            
+            results['joints_4d'] = joints_4d
+            results['joints_4d_visible'] = joints_4d_visible
 
         return results
 

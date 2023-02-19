@@ -36,6 +36,8 @@ def fliplr_joints(joints_3d, joints_3d_visible, img_width, flip_pairs):
     joints_3d_flipped = joints_3d.copy()
     joints_3d_visible_flipped = joints_3d_visible.copy()
 
+    import pdb
+    pdb.set_trace()
     # Swap left-right parts
     for left, right in flip_pairs:
         joints_3d_flipped[left, :] = joints_3d[right, :]
