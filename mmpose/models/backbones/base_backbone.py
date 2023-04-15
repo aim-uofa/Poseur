@@ -1,5 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import logging
+from mmcv.runner import BaseModule
 from abc import ABCMeta, abstractmethod
 
 import torch.nn as nn
@@ -7,12 +8,14 @@ import torch.nn as nn
 from .utils import load_checkpoint
 
 
-class BaseBackbone(nn.Module, metaclass=ABCMeta):
+class BaseBackbone(BaseModule, metaclass=ABCMeta):
     """Base backbone.
 
     This class defines the basic functions of a backbone. Any backbone that
     inherits this class should at least define its own `forward` function.
     """
+    def __init__(self, init_cfg=None):
+        super(BaseBackbone, self).__init__(init_cfg)
 
     def init_weights(self, pretrained=None):
         """Init backbone weights.
@@ -23,6 +26,8 @@ class BaseBackbone(nn.Module, metaclass=ABCMeta):
                 checkpoint. If pretrained is None, then it follows default
                 initializer or customized initializer in subclasses.
         """
+        import pdb
+        pdb.set_trace()
         if isinstance(pretrained, str):
             logger = logging.getLogger()
             load_checkpoint(self, pretrained, strict=False, logger=logger)

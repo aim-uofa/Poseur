@@ -1146,32 +1146,32 @@ class PoseurTransformer(Transformer):
         self.level_embeds = nn.Parameter(
             torch.Tensor(self.num_feature_levels, self.embed_dims))
 
-        if self.as_two_stage:
-            self.avg_pool = nn.AdaptiveAvgPool2d(1)
-            self.fc_sigma = Linear_with_norm(self.embed_dims, self.num_joints * 2, norm=False)
-            if self.use_soft_argmax:
-                self.soft_argmax_coord = Heatmap1DHead(in_channels=self.embed_dims, expand_ratio=2, hidden_dims=(512, ), 
-                                                        image_size=self.image_size, stride = self.soft_arg_stride)
-                self.fc_layers = [self.fc_sigma]
-            elif self.use_soft_argmax_def:
-                self.soft_argmax_coord = Heatmap2DHead(in_channels=self.embed_dims,
-                                                        image_size=self.image_size, stride = self.soft_arg_stride)
-                self.fc_layers = [self.fc_sigma]
-            else:
-                self.fc_coord = Linear_with_norm(self.embed_dims, self.num_joints * 2)
-                self.fc_layers = [self.fc_coord, self.fc_sigma]
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)
+        self.fc_sigma = Linear_with_norm(self.embed_dims, self.num_joints * 2, norm=False)
 
-            if self.query_pose_emb:
-                self.pos_trans = nn.Linear(self.embed_dims * 2,
-                                        self.embed_dims)
-                self.pos_trans_norm = nn.LayerNorm(self.embed_dims)
-                self.pos_embed = nn.Embedding(self.num_joints, self.embed_dims)
-            else:
-                self.pos_trans = nn.Linear(self.embed_dims * 2,
-                                        self.embed_dims * 2)
-                self.pos_trans_norm = nn.LayerNorm(self.embed_dims * 2)
+        if self.use_soft_argmax:
+            self.soft_argmax_coord = Heatmap1DHead(in_channels=self.embed_dims, expand_ratio=2, hidden_dims=(512, ), 
+                                                    image_size=self.image_size, stride = self.soft_arg_stride)
+            self.fc_layers = [self.fc_sigma]
+        elif self.use_soft_argmax_def:
+            self.soft_argmax_coord = Heatmap2DHead(in_channels=self.embed_dims,
+                                                    image_size=self.image_size, stride = self.soft_arg_stride)
+            self.fc_layers = [self.fc_sigma]
         else:
-            self.reference_points = nn.Linear(self.embed_dims, 2)
+            self.fc_coord = Linear_with_norm(self.embed_dims, self.num_joints * 2)
+            self.fc_layers = [self.fc_coord, self.fc_sigma]
+
+        if self.query_pose_emb:
+            self.pos_trans = nn.Linear(self.embed_dims * 2,
+                                    self.embed_dims)
+            self.pos_trans_norm = nn.LayerNorm(self.embed_dims)
+            self.pos_embed = nn.Embedding(self.num_joints, self.embed_dims)
+        else:
+            self.pos_trans = nn.Linear(self.embed_dims * 2,
+                                    self.embed_dims * 2)
+            self.pos_trans_norm = nn.LayerNorm(self.embed_dims * 2)
+        # else:
+        #     self.reference_points = nn.Linear(self.embed_dims, 2)
         self.fp16_enabled = False
 
     def init_weights(self):
@@ -1182,16 +1182,15 @@ class PoseurTransformer(Transformer):
         for m in self.modules():
             if isinstance(m, MultiScaleDeformableAttention):
                 m.init_weights()
-        if not self.as_two_stage:
-            xavier_init(self.reference_points, distribution='uniform', bias=0.)
+        # if not self.as_two_stage:
+        #     xavier_init(self.reference_points, distribution='uniform', bias=0.)
         normal_(self.level_embeds)
         if self.use_soft_argmax:
             self.soft_argmax_coord.init_weights()
 
-        if self.as_two_stage:
-            for m in self.fc_layers:
-                if isinstance(m, nn.Linear):
-                    nn.init.xavier_uniform_(m.weight, gain=0.01)
+        for m in self.fc_layers:
+            if isinstance(m, nn.Linear):
+                nn.init.xavier_uniform_(m.weight, gain=0.01)
 
     def gen_encoder_output_proposals(self, memory, memory_padding_mask,
                                      spatial_shapes):
@@ -1537,7 +1536,7 @@ class Poseur3DTransformer(PoseurTransformer):
                  smpl_regressor=None,
                  **kwargs):
         super(PoseurTransformer, self).__init__(**kwargs)
-        assert query_pose_emb == True
+        # assert query_pose_emb == True
         self.num_noise_verts = num_noise_verts
         self.noise_sigma = noise_sigma
         self.add_feat_2_query = add_feat_2_query
@@ -1570,32 +1569,33 @@ class Poseur3DTransformer(PoseurTransformer):
         self.level_embeds = nn.Parameter(
             torch.Tensor(self.num_feature_levels, self.embed_dims))
 
-        if self.as_two_stage:
-            self.avg_pool = nn.AdaptiveAvgPool2d(1)
-            self.fc_sigma = Linear_with_norm(self.embed_dims, self.num_joints * 2, norm=False)
-            if self.use_soft_argmax:
-                self.soft_argmax_coord = Heatmap1DHead(in_channels=self.embed_dims, expand_ratio=2, hidden_dims=(512, ), 
-                                                        image_size=self.image_size, stride = self.soft_arg_stride)
-                self.fc_layers = [self.fc_sigma]
-            elif self.use_soft_argmax_def:
-                self.soft_argmax_coord = Heatmap2DHead(in_channels=self.embed_dims,
-                                                        image_size=self.image_size, stride = self.soft_arg_stride)
-                self.fc_layers = [self.fc_sigma]
-            else:
-                self.fc_coord = Linear_with_norm(self.embed_dims, self.num_joints * 2)
-                self.fc_layers = [self.fc_coord, self.fc_sigma]
-
-            if self.query_pose_emb:
-                self.pos_trans = nn.Linear(self.embed_dims * 2,
-                                        self.embed_dims)
-                self.pos_trans_norm = nn.LayerNorm(self.embed_dims)
-                self.pos_embed = nn.Embedding(self.num_joints, self.embed_dims)
-            else:
-                self.pos_trans = nn.Linear(self.embed_dims * 2,
-                                        self.embed_dims * 2)
-                self.pos_trans_norm = nn.LayerNorm(self.embed_dims * 2)
+        # if self.as_two_stage:
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)
+        self.fc_sigma = Linear_with_norm(self.embed_dims, self.num_joints * 2, norm=False)
+        if self.use_soft_argmax:
+            self.soft_argmax_coord = Heatmap1DHead(in_channels=self.embed_dims, expand_ratio=2, hidden_dims=(512, ), 
+                                                    image_size=self.image_size, stride = self.soft_arg_stride)
+            self.fc_layers = [self.fc_sigma]
+        elif self.use_soft_argmax_def:
+            self.soft_argmax_coord = Heatmap2DHead(in_channels=self.embed_dims,
+                                                    image_size=self.image_size, stride = self.soft_arg_stride)
+            self.fc_layers = [self.fc_sigma]
         else:
-            self.reference_points = nn.Linear(self.embed_dims, 2)
+            self.fc_coord = Linear_with_norm(self.embed_dims, self.num_joints * 2)
+            self.fc_layers = [self.fc_coord, self.fc_sigma]
+
+        if self.as_two_stage and self.query_pose_emb:
+            self.pos_trans = nn.Linear(self.embed_dims * 2,
+                                    self.embed_dims)
+            self.pos_trans_norm = nn.LayerNorm(self.embed_dims)
+        
+        self.pos_embed = nn.Embedding(self.num_joints, self.embed_dims)
+        # else:
+        #     self.pos_trans = nn.Linear(self.embed_dims * 2,
+        #                             self.embed_dims * 2)
+        #     self.pos_trans_norm = nn.LayerNorm(self.embed_dims * 2)
+        # else:
+        #     self.reference_points = nn.Linear(self.embed_dims, 2)
 
         
         # if self.pred_smpl_params:
@@ -1619,10 +1619,9 @@ class Poseur3DTransformer(PoseurTransformer):
 
         offset_noise = self.prior.sample((bs, 1, self.num_noise_verts))
         offset_noise = offset_noise.clip(-1, 1)
-
         rand_index = torch.randperm(self.num_joints, 
             device=reference_points.device)[:self.num_noise_verts]
-        rand_index = rand_index[None, :, None].repeat(bs, 1, 2)
+        rand_index = rand_index[None, :, None].repeat(bs, 1, 1)
         # import pdb
         # pdb.set_trace()
         if reference_points.dim() == 4:
@@ -1645,6 +1644,7 @@ class Poseur3DTransformer(PoseurTransformer):
                 reg_branches=None,
                 fc_coord=None,
                 cls_branches=None,
+                attn_masks=None,
                 **kwargs):
 
         if not self.training:
@@ -1759,18 +1759,21 @@ class Poseur3DTransformer(PoseurTransformer):
             reference_points_cliped = reference_points.clip(0, 1)
 
         init_reference_out = reference_points_cliped
-        pred_jts_pos_embed = self.get_proposal_pos_embed(reference_points.detach())
 
-        reference_points_pos_embed = self.get_proposal_pos_embed(reference_points_cliped.detach()) # query init here
-        
-        if self.add_feat_2_query:
-            query_feat = point_sample(point_sample_feat, init_reference_out, align_corners=False).permute(0, 2, 1)
-            reference_points_pos_embed = reference_points_pos_embed + query_feat
-        query_pos_emb = torch.cat([pred_jts_pos_embed, reference_points_pos_embed], dim=2)
-        pos_trans_out = self.pos_trans_norm(self.pos_trans(query_pos_emb))
-        query = pos_trans_out
-        # import pdb
-        # pdb.set_trace()
+        if self.as_two_stage:
+            pred_jts_pos_embed = self.get_proposal_pos_embed(reference_points.detach())
+            reference_points_pos_embed = self.get_proposal_pos_embed(reference_points_cliped.detach()) # query init here
+            if self.add_feat_2_query:
+                query_feat = point_sample(point_sample_feat, init_reference_out, align_corners=False).permute(0, 2, 1)
+                reference_points_pos_embed = reference_points_pos_embed + query_feat
+            query_pos_emb = torch.cat([pred_jts_pos_embed, reference_points_pos_embed], dim=2)
+            pos_trans_out = self.pos_trans_norm(self.pos_trans(query_pos_emb))
+            query = pos_trans_out
+        else:
+            query = query_embed.unsqueeze(0).expand(BATCH_SIZE, -1, -1)
+            # import pdb
+            # pdb.set_trace()
+
         if self.training:
             query_pos = self.pos_embed.weight.clone().repeat(bs, 1, 1)
             query_pos_noise = self.pos_embed.weight.clone()[rand_index[..., 0]]
@@ -1794,6 +1797,7 @@ class Poseur3DTransformer(PoseurTransformer):
             valid_ratios=valid_ratios,
             reg_branches=reg_branches,
             fc_coord=fc_coord,
+            attn_masks=attn_masks,
             **kwargs)
 
         inter_references_out = inter_references
