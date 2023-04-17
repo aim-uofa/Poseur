@@ -47,8 +47,7 @@ python demo/top_down_img_demo.py \
     --out-img-root vis_results_poseur
 ```
 
-## Models
-### COCO Keypoint Detection Results
+## COCO Keypoint Detection
 
 Name | AP | AP.5| AP.75 |download
 --- |:---:|:---:|:---:|:---:
@@ -62,6 +61,7 @@ Name | AP | AP.5| AP.75 |download
 [poseur_hrformer_big_coco_256x192](configs/poseur/coco/poseur_hrformer_big_coco_256x192.py)| 78.9  | 91.9 |85.6 | [model](https://cloudstor.aarnet.edu.au/plus/s/34udjbTr9p9Aigo/download)
 [poseur_hrformer_big_coco_384x288](configs/poseur/coco/poseur_hrformer_big_coco_384x288.py)| 79.6  | 92.1 |85.9 | [model](https://cloudstor.aarnet.edu.au/plus/s/KST3aSAlGd8PJpQ/download)
 [poseur_vit_base_coco_256x192](configs/poseur/coco/poseur_vit_base_coco_256x192.py)| 76.7  | 90.6 |83.5 | [model](https://cloudstor.aarnet.edu.au/plus/s/46foUsIwzmHiVmb/download)
+
 
 ## COCO-WholeBody Benchmark (V0.5)
 
@@ -77,7 +77,14 @@ Compare Whole-body pose estimation results with other methods.
 |ZoomNas [4]      | 0.740 |  -     | 0.617 |   -    | 0.889 |    -   | 0.625 |   -    | 0.654 |  -   |
 |RTMPose [5]      | 0.730 |   -    | 0.734 |   -    | 0.898 |    -   | 0.587 |   -    | 0.669 |  -   |
 |Poseur_ResNet50  | 0.655 | 0.732 | 0.615 | 0.742 | 0.844 | 0.900 | 0.560 | 0.673 | 0.587 | 0.681 |
+|Poseur_HRNet_W32 | 0.680 | 0.753 | 0.668 | 0.780 | 0.863 | 0.912 | 0.604 | 0.706 | 0.620 | 0.707 |
 |Poseur_HRNet_W48 | 0.692 | 0.766 | 0.689 | 0.799 | 0.861 | 0.911 | 0.621 | 0.721 | 0.633 | 0.721 |
+
+### COCO-WholeBody Pretrain Models
+[poseur_res50_coco_wholebody_256x192](configs/poseur/coco_wholebody/res50_coco_wholebody_256x192_poseur.py)| 65.5 | 85.0 | 71.8 | [model](https://cloudstor.aarnet.edu.au/plus/s/pLNFGWavdFAji5J/download)
+[poseur_hrnet_w32_coco_wholebody_256x192](configs/poseur/coco_wholebody/hrnet_w32_coco_wholebody_256x192_poseur.py)| 68.0  | 85.8 | 74.4 | [model](https://cloudstor.aarnet.edu.au/plus/s/eGfWFWYasRtoFo5/download)
+[poseur_hrnet_w48_coco_wholebody_256x192](configs/poseur/coco_wholebody/hrnet_w48_coco_wholebody_256x192_poseur.py)| 69.2  | 86.0 | 75.7 | [model](https://cloudstor.aarnet.edu.au/plus/s/LBokqDr1DK7s7C4/download)
+
 
 *Disclaimer:*
 
