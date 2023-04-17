@@ -49,7 +49,7 @@ python demo/top_down_img_demo.py \
 
 ## COCO Keypoint Detection
 
-Name | AP | AP.5| AP.75 |download
+Name | AP | AP.5| AP.75 |download link
 --- |:---:|:---:|:---:|:---:
 [poseur_mobilenetv2_coco_256x192](configs/poseur/coco/poseur_mobilenetv2_coco_256x192.py)| 71.9  | 88.9 |78.6 | [model](https://cloudstor.aarnet.edu.au/plus/s/L198TFFqwWYsSop/download)
 [poseur_mobilenetv2_coco_256x192_12dec](configs/poseur/coco/poseur_mobilenetv2_coco_256x192_12dec.py)| 72.3  | 88.9 |78.9 | [model](https://cloudstor.aarnet.edu.au/plus/s/sw0II7qSQDjJ88h/download)
@@ -81,6 +81,9 @@ Compare Whole-body pose estimation results with other methods.
 |Poseur_HRNet_W48 | 0.692 | 0.766 | 0.689 | 0.799 | 0.861 | 0.911 | 0.621 | 0.721 | 0.633 | 0.721 |
 
 ### COCO-WholeBody Pretrain Models
+
+Name | AP | AP.5| AP.75 |download link
+--- |:---:|:---:|:---:|:---:
 [poseur_res50_coco_wholebody_256x192](configs/poseur/coco_wholebody/res50_coco_wholebody_256x192_poseur.py)| 65.5 | 85.0 | 71.8 | [model](https://cloudstor.aarnet.edu.au/plus/s/pLNFGWavdFAji5J/download)
 [poseur_hrnet_w32_coco_wholebody_256x192](configs/poseur/coco_wholebody/hrnet_w32_coco_wholebody_256x192_poseur.py)| 68.0  | 85.8 | 74.4 | [model](https://cloudstor.aarnet.edu.au/plus/s/eGfWFWYasRtoFo5/download)
 [poseur_hrnet_w48_coco_wholebody_256x192](configs/poseur/coco_wholebody/hrnet_w48_coco_wholebody_256x192_poseur.py)| 69.2  | 86.0 | 75.7 | [model](https://cloudstor.aarnet.edu.au/plus/s/LBokqDr1DK7s7C4/download)
