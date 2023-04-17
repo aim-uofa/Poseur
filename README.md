@@ -9,6 +9,7 @@
 
 ## News :triangular_flag_on_post:
 [2023/04/17] Release Poseur based on ViT backbone. Please see [poseur_vit_base_coco_256x192](configs/poseur/coco/poseur_vit_base_coco_256x192.py).
+
 [2023/04/17] Release Poseur trained on COCO-Wholebody dataset. Please see [poseur_coco_wholebody](configs/poseur/coco_wholebody/).
 
 # Introduction
