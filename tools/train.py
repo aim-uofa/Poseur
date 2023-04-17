@@ -18,10 +18,19 @@ from mmpose.apis import init_random_seed, train_model
 from mmpose.datasets import build_dataset
 from mmpose.models import build_posenet
 from mmpose.utils import collect_env, get_root_logger, setup_multi_processes
+from mmpose.core.optimizers import LayerDecayOptimizerConstructor
 
+import debugpy
+
+def attach_debugger():
+    debugpy.listen(5679)
+    print("Waiting for debugger!")
+    debugpy.wait_for_client()
+    print("Attached!")
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a pose model')
+    parser.add_argument('-d', '--debug', action='store_true')
     parser.add_argument('config', help='train config file path')
     parser.add_argument('--work-dir', help='the dir to save logs and models')
     parser.add_argument(
@@ -81,9 +90,10 @@ def parse_args():
 
     return args
 
-
 def main():
     args = parse_args()
+    if args.debug:
+        attach_debugger()
 
     cfg = Config.fromfile(args.config)
 
@@ -195,7 +205,6 @@ def main():
         validate=(not args.no_validate),
         timestamp=timestamp,
         meta=meta)
-
 
 if __name__ == '__main__':
     main()

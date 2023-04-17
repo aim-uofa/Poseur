@@ -69,8 +69,6 @@ class ChannelMapper(nn.Module):
 
     def forward(self, inputs):
         """Forward function."""
-        
-        
         assert len(inputs) == len(self.convs)
         outs = [self.convs[i](inputs[i]) for i in range(len(inputs))]
         return tuple(outs)

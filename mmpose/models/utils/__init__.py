@@ -15,12 +15,12 @@ from .transformer import (PatchEmbed,
                             PoseurTransformer, 
                             Poseur3DTransformer, 
                             DetrTransformerEncoder_zero_layer,
-                            # DeformableDetrTransformerDecoder, 
-                            # DetrTransformerDecoderLayer,
+                            DeformableDetrTransformerDecoder, 
+                            DetrTransformerDecoderLayer,
                             DetrTransformerDecoderLayer_grouped)
 
-# from .positional_encoding import (LearnedPositionalEncoding,
-#                                   SinePositionalEncoding)
+from .positional_encoding import (LearnedPositionalEncoding,
+                                  SinePositionalEncoding)
 
 __all__ = [
     'SMPL', 'PatchEmbed', 'nchw_to_nlc', 'nlc_to_nchw', 'pvt_convert',
@@ -29,5 +29,5 @@ __all__ = [
     'TCFormerRegularBlock', 'TCFormerDynamicBlock', 'cluster_dpc_knn',
     'merge_tokens', 'token_interp', 'tcformer_convert',
     'PoseurTransformer', 'Poseur3DTransformer',
-    # 'DetrTransformerDecoderLayer'
+    'DetrTransformerDecoderLayer'
 ]

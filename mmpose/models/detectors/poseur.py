@@ -32,7 +32,9 @@ class Poseur(TopDown):
 
     def init_weights(self, pretrained=None):
         """Weight initialization for model."""
-        self.backbone.init_weights(pretrained)
+        if pretrained is not None:
+            self.pretrained = pretrained
+        self.backbone.init_weights(self.pretrained)
         if self.with_neck:
             self.neck.init_weights()
         if self.with_keypoint:

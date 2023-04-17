@@ -9,6 +9,7 @@ NODE_RANK=${NODE_RANK:-0}
 PORT=$(( RANDOM % 100 + 12300 ))
 MASTER_ADDR=${MASTER_ADDR:-"127.0.0.1"}
 
+# CUDA_VISIBLE_DEVICES='1' \
 PYTHONPATH="$(dirname $0)/..":$PYTHONPATH \
 python -m torch.distributed.launch \
     --nnodes=$NNODES \

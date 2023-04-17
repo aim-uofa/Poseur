@@ -426,7 +426,7 @@ def inverse_sigmoid(x, eps=1e-5):
     return torch.log(x1 / x2)
 
 
-@TRANSFORMER_LAYER_SEQUENCE.register_module()
+@TRANSFORMER_LAYER_SEQUENCE.register_module(force=True)
 class DetrTransformerEncoder_zero_layer():
     def __init__(self, *args, post_norm_cfg=dict(type='LN'), **kwargs):
         pass
@@ -445,51 +445,51 @@ class DetrTransformerEncoder_zero_layer():
         return query
 
 
-# @TRANSFORMER_LAYER.register_module()
-# class DetrTransformerDecoderLayer(BaseTransformerLayer):
-#     """Implements decoder layer in DETR transformer.
-#     Args:
-#         attn_cfgs (list[`mmcv.ConfigDict`] | list[dict] | dict )):
-#             Configs for self_attention or cross_attention, the order
-#             should be consistent with it in `operation_order`. If it is
-#             a dict, it would be expand to the number of attention in
-#             `operation_order`.
-#         feedforward_channels (int): The hidden dimension for FFNs.
-#         ffn_dropout (float): Probability of an element to be zeroed
-#             in ffn. Default 0.0.
-#         operation_order (tuple[str]): The execution order of operation
-#             in transformer. Such as ('self_attn', 'norm', 'ffn', 'norm').
-#             Default：None
-#         act_cfg (dict): The activation config for FFNs. Default: `LN`
-#         norm_cfg (dict): Config dict for normalization layer.
-#             Default: `LN`.
-#         ffn_num_fcs (int): The number of fully-connected layers in FFNs.
-#             Default：2.
-#     """
+@TRANSFORMER_LAYER.register_module(force=True)
+class DetrTransformerDecoderLayer(BaseTransformerLayer):
+    """Implements decoder layer in DETR transformer.
+    Args:
+        attn_cfgs (list[`mmcv.ConfigDict`] | list[dict] | dict )):
+            Configs for self_attention or cross_attention, the order
+            should be consistent with it in `operation_order`. If it is
+            a dict, it would be expand to the number of attention in
+            `operation_order`.
+        feedforward_channels (int): The hidden dimension for FFNs.
+        ffn_dropout (float): Probability of an element to be zeroed
+            in ffn. Default 0.0.
+        operation_order (tuple[str]): The execution order of operation
+            in transformer. Such as ('self_attn', 'norm', 'ffn', 'norm').
+            Default：None
+        act_cfg (dict): The activation config for FFNs. Default: `LN`
+        norm_cfg (dict): Config dict for normalization layer.
+            Default: `LN`.
+        ffn_num_fcs (int): The number of fully-connected layers in FFNs.
+            Default：2.
+    """
 
-#     def __init__(self,
-#                  attn_cfgs,
-#                  feedforward_channels,
-#                  ffn_dropout=0.0,
-#                  operation_order=None,
-#                  act_cfg=dict(type='ReLU', inplace=True),
-#                  norm_cfg=dict(type='LN'),
-#                  ffn_num_fcs=2,
-#                  **kwargs):
-#         super(DetrTransformerDecoderLayer, self).__init__(
-#             attn_cfgs=attn_cfgs,
-#             feedforward_channels=feedforward_channels,
-#             ffn_dropout=ffn_dropout,
-#             operation_order=operation_order,
-#             act_cfg=act_cfg,
-#             norm_cfg=norm_cfg,
-#             ffn_num_fcs=ffn_num_fcs,
-#             **kwargs)
-#         assert len(operation_order) == 6
-#         assert set(operation_order) == set(
-#             ['self_attn', 'norm', 'cross_attn', 'ffn'])
+    def __init__(self,
+                 attn_cfgs,
+                 feedforward_channels,
+                 ffn_dropout=0.0,
+                 operation_order=None,
+                 act_cfg=dict(type='ReLU', inplace=True),
+                 norm_cfg=dict(type='LN'),
+                 ffn_num_fcs=2,
+                 **kwargs):
+        super(DetrTransformerDecoderLayer, self).__init__(
+            attn_cfgs=attn_cfgs,
+            feedforward_channels=feedforward_channels,
+            ffn_dropout=ffn_dropout,
+            operation_order=operation_order,
+            act_cfg=act_cfg,
+            norm_cfg=norm_cfg,
+            ffn_num_fcs=ffn_num_fcs,
+            **kwargs)
+        assert len(operation_order) == 6
+        assert set(operation_order) == set(
+            ['self_attn', 'norm', 'cross_attn', 'ffn'])
 
-@TRANSFORMER_LAYER.register_module()
+@TRANSFORMER_LAYER.register_module(force=True)
 class DetrTransformerDecoderLayer_grouped(BaseTransformerLayer):
     def __init__(self,
                  attn_cfgs,
@@ -606,77 +606,77 @@ class DetrTransformerDecoderLayer_grouped(BaseTransformerLayer):
         return query
 
 
-# @TRANSFORMER_LAYER_SEQUENCE.register_module()
-# class DeformableDetrTransformerDecoder(TransformerLayerSequence):
-#     """Implements the decoder in DETR transformer.
-#     Args:
-#         return_intermediate (bool): Whether to return intermediate outputs.
-#         coder_norm_cfg (dict): Config of last normalization layer. Default：
-#             `LN`.
-#     """
+@TRANSFORMER_LAYER_SEQUENCE.register_module(force=True)
+class DeformableDetrTransformerDecoder(TransformerLayerSequence):
+    """Implements the decoder in DETR transformer.
+    Args:
+        return_intermediate (bool): Whether to return intermediate outputs.
+        coder_norm_cfg (dict): Config of last normalization layer. Default：
+            `LN`.
+    """
 
-#     def __init__(self, *args, return_intermediate=False, **kwargs):
+    def __init__(self, *args, return_intermediate=False, **kwargs):
 
-#         super(DeformableDetrTransformerDecoder, self).__init__(*args, **kwargs)
-#         self.return_intermediate = return_intermediate
+        super(DeformableDetrTransformerDecoder, self).__init__(*args, **kwargs)
+        self.return_intermediate = return_intermediate
 
-#     def forward(self,
-#                 query,
-#                 *args,
-#                 reference_points=None,
-#                 valid_ratios=None,
-#                 reg_branches=None,
-#                 fc_coord=None,
-#                 **kwargs):
-#         output = query
-#         intermediate = []
-#         intermediate_reference_points = []
-#         for lid, layer in enumerate(self.layers):
-#             if reference_points.shape[-1] == 4:
-#                 reference_points_input = reference_points[:, :, None] * \
-#                     torch.cat([valid_ratios, valid_ratios], -1)[:, None]
-#             else:
-#                 assert reference_points.shape[-1] == 2
-#                 reference_points_input = reference_points[:, :, None] * \
-#                     valid_ratios[:, None]
-#             output = layer(
-#                 output,
-#                 *args,
-#                 reference_points=reference_points_input,
-#                 **kwargs)
-#             output = output.permute(1, 0, 2)
+    def forward(self,
+                query,
+                *args,
+                reference_points=None,
+                valid_ratios=None,
+                reg_branches=None,
+                fc_coord=None,
+                **kwargs):
+        output = query
+        intermediate = []
+        intermediate_reference_points = []
+        for lid, layer in enumerate(self.layers):
+            if reference_points.shape[-1] == 4:
+                reference_points_input = reference_points[:, :, None] * \
+                    torch.cat([valid_ratios, valid_ratios], -1)[:, None]
+            else:
+                assert reference_points.shape[-1] == 2
+                reference_points_input = reference_points[:, :, None] * \
+                    valid_ratios[:, None]
+            output = layer(
+                output,
+                *args,
+                reference_points=reference_points_input,
+                **kwargs)
+            output = output.permute(1, 0, 2)
 
-#             if reg_branches is not None:
-#                 tmp = reg_branches[lid](output)
-#                 if fc_coord is not None:
-#                     tmp = fc_coord(tmp)
+            if reg_branches is not None:
+                tmp = reg_branches[lid](output)
+                if fc_coord is not None:
+                    tmp = fc_coord(tmp)
 
-#                 if reference_points.shape[-1] == 4:
-#                     new_reference_points = tmp + inverse_sigmoid(
-#                         reference_points)
-#                     new_reference_points = new_reference_points.sigmoid()
-#                 else:
-#                     assert reference_points.shape[-1] == 2
-#                     new_reference_points = tmp
-#                     new_reference_points[..., :2] = tmp[
-#                         ..., :2] + inverse_sigmoid(reference_points)
-#                     new_reference_points = new_reference_points.sigmoid()
-#                 # reference_points = new_reference_points.detach()
-#                 reference_points = new_reference_points
-#             output = output.permute(1, 0, 2)
-#             if self.return_intermediate:
-#                 intermediate.append(output)
-#                 intermediate_reference_points.append(reference_points)
+                if reference_points.shape[-1] == 4:
+                    new_reference_points = tmp + inverse_sigmoid(
+                        reference_points)
+                    new_reference_points = new_reference_points.sigmoid()
+                else:
+                    assert reference_points.shape[-1] == 2
+                    new_reference_points = tmp
+                    new_reference_points[..., :2] = tmp[
+                        ..., :2] + inverse_sigmoid(reference_points)
+                    new_reference_points = new_reference_points.sigmoid()
+                # reference_points = new_reference_points.detach()
+                reference_points = new_reference_points
+            output = output.permute(1, 0, 2)
+            if self.return_intermediate:
+                intermediate.append(output)
+                intermediate_reference_points.append(reference_points)
 
-#         if self.return_intermediate:
-#             return torch.stack(intermediate), torch.stack(
-#                 intermediate_reference_points)
+        if self.return_intermediate:
+            return torch.stack(intermediate), torch.stack(
+                intermediate_reference_points)
 
-#         return output, reference_points
+        return output, reference_points
 
 
 
-@TRANSFORMER_LAYER_SEQUENCE.register_module()
+@TRANSFORMER_LAYER_SEQUENCE.register_module(force=True)
 class Detr3DTransformerDecoder(TransformerLayerSequence):
     """Implements the decoder in DETR3D transformer.
     Args:
@@ -751,7 +751,7 @@ class Detr3DTransformerDecoder(TransformerLayerSequence):
         return output, reference_points
 
 
-@ATTENTION.register_module()
+@ATTENTION.register_module(force=True)
 class Detr3DCrossAtten(BaseModule):
     """An attention module used in Detr3d.
     Args:
@@ -992,7 +992,6 @@ def feature_sampling(mlvl_feats,
     sampled_feats = \
         sampled_feats.view(B, C, num_query, num_cam, 1, len(mlvl_feats))
     return ref_pt_3d, sampled_feats, mask
-
 
 
 class Linear_with_norm(nn.Module):

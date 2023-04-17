@@ -3,7 +3,6 @@ import mmcv
 import mmpose.ops
 from .version import __version__, short_version
 
-
 def digit_version(version_str):
     digit_version = []
     for x in version_str.split('.'):

@@ -317,8 +317,6 @@ class TopDownAffine:
         self.use_udp = use_udp
 
     def __call__(self, results):
-        import pdb
-        pdb.set_trace()
         image_size = results['ann_info']['image_size']
         img = results['img']
         joints_3d = results['joints_3d']

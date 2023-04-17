@@ -26,8 +26,6 @@ class BaseBackbone(BaseModule, metaclass=ABCMeta):
                 checkpoint. If pretrained is None, then it follows default
                 initializer or customized initializer in subclasses.
         """
-        import pdb
-        pdb.set_trace()
         if isinstance(pretrained, str):
             logger = logging.getLogger()
             load_checkpoint(self, pretrained, strict=False, logger=logger)

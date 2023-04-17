@@ -5,8 +5,8 @@ import warnings
 from mmcv.runner import DefaultOptimizerConstructor, get_dist_info
 
 from mmpose.utils import get_root_logger
-from .builder import OPTIMIZER_BUILDERS
-
+# from .builder import OPTIMIZER_BUILDERS
+from mmcv.runner import OPTIMIZER_BUILDERS, DefaultOptimizerConstructor
 
 def get_layer_id_for_convnext(var_name, max_layer_id):
     """Get the layer id to set the different learning rates in ``layer_wise``
@@ -95,9 +95,11 @@ def get_layer_id_for_vit(var_name, max_layer_id):
     elif var_name.startswith('backbone.layers'):
         layer_id = int(var_name.split('.')[2])
         return layer_id + 1
+    elif var_name.startswith("backbone.blocks"):
+        layer_id = int(var_name.split('.')[2])
+        return layer_id + 1
     else:
         return max_layer_id - 1
-
 
 @OPTIMIZER_BUILDERS.register_module()
 class LearningRateDecayOptimizerConstructor(DefaultOptimizerConstructor):
@@ -138,23 +140,41 @@ class LearningRateDecayOptimizerConstructor(DefaultOptimizerConstructor):
             else:
                 group_name = 'decay'
                 this_weight_decay = weight_decay
+
             if 'layer_wise' in decay_type:
-                if 'ConvNeXt' in module.backbone.__class__.__name__:
-                    layer_id = get_layer_id_for_convnext(
-                        name, self.paramwise_cfg.get('num_layers'))
-                    logger.info(f'set param {name} as id {layer_id}')
-                elif 'BEiT' in module.backbone.__class__.__name__ or \
-                     'MAE' in module.backbone.__class__.__name__:
-                    layer_id = get_layer_id_for_vit(name, num_layers)
-                    logger.info(f'set param {name} as id {layer_id}')
+                if hasattr(module, 'backbone'):
+                    if 'ConvNeXt' in module.backbone.__class__.__name__:
+                        layer_id = get_layer_id_for_convnext(
+                            name, self.paramwise_cfg.get('num_layers'))
+                        logger.info(f'set param {name} as id {layer_id}')
+                    elif 'BEiT' in module.backbone.__class__.__name__ or \
+                        'MAE' in module.backbone.__class__.__name__ or \
+                            'ViT' in module.backbone.__class__.__name__:
+                        layer_id = get_layer_id_for_vit(name, num_layers)
+                        logger.info(f'set param {name} as id {layer_id}')
+                    else:
+                        raise NotImplementedError()
                 else:
-                    raise NotImplementedError()
+                    if 'ConvNeXt' in module.__class__.__name__:
+                        layer_id = get_layer_id_for_convnext(
+                            name, self.paramwise_cfg.get('num_layers'))
+                        logger.info(f'set param {name} as id {layer_id}')
+                    elif 'BEiT' in module.__class__.__name__ or \
+                        'MAE' in module.__class__.__name__ or \
+                            'ViT' in module.__class__.__name__:
+                        layer_id = get_layer_id_for_vit(name, num_layers)
+                        logger.info(f'set param {name} as id {layer_id}')
+                    else:
+                        raise NotImplementedError()
+
+
             elif decay_type == 'stage_wise':
                 if 'ConvNeXt' in module.backbone.__class__.__name__:
                     layer_id = get_stage_id_for_convnext(name, num_layers)
                     logger.info(f'set param {name} as id {layer_id}')
                 else:
                     raise NotImplementedError()
+            
             group_name = f'layer_{layer_id}_{group_name}'
 
             if group_name not in parameter_groups:
@@ -171,6 +191,8 @@ class LearningRateDecayOptimizerConstructor(DefaultOptimizerConstructor):
 
             parameter_groups[group_name]['params'].append(param)
             parameter_groups[group_name]['param_names'].append(name)
+
+
         rank, _ = get_dist_info()
         if rank == 0:
             to_display = {}
