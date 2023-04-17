@@ -7,6 +7,10 @@
 > *arXiv preprint ([arXiv 2201.07412](https://arxiv.org/pdf/2201.07412))*  
 > (\* equal contribution)
 
+## News :triangular_flag_on_post:
+[2023/04/17] Release Poseur based on ViT backbone. Please see [poseur_vit_base_coco_256x192](configs/poseur/coco/poseur_vit_base_coco_256x192.py).
+[2023/04/17] Release Poseur trained on COCO-Wholebody dataset. Please see [poseur_coco_wholebody](configs/poseur/coco_wholebody/).
+
 # Introduction
 This is a preview for Poseur, which currently including Poseur with R-50 backbone for both training and inference. More models with various backbones will be released soon. This project is bulit upon [MMPose](https://github.com/open-mmlab/mmpose) with commit ID [eeebc652842a9724259ed345c00112641d8ee06d](https://github.com/open-mmlab/mmpose/commit/eeebc652842a9724259ed345c00112641d8ee06d).
 
