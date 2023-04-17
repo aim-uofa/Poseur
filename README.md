@@ -13,7 +13,7 @@
 [2023/04/17] Release a naive version of Poseur trained on COCO-Wholebody dataset. Please see [poseur_coco_wholebody](configs/poseur/coco_wholebody/).
 
 # Introduction
-This is a preview for Poseur, which currently including Poseur with R-50 backbone for both training and inference. More models with various backbones will be released soon. This project is bulit upon [MMPose](https://github.com/open-mmlab/mmpose) with commit ID [eeebc652842a9724259ed345c00112641d8ee06d](https://github.com/open-mmlab/mmpose/commit/eeebc652842a9724259ed345c00112641d8ee06d).
+This project is bulit upon [MMPose](https://github.com/open-mmlab/mmpose) with commit ID [eeebc652842a9724259ed345c00112641d8ee06d](https://github.com/open-mmlab/mmpose/commit/eeebc652842a9724259ed345c00112641d8ee06d).
 
 # Installation & Quick Start
 1. Install following packages
@@ -61,7 +61,7 @@ Name | AP | AP.5| AP.75 |download
 [poseur_hrformer_small_coco_256x192_3dec](configs/poseur/coco/poseur_hrformer_small_coco_256x192_3dec.py)| 76.6  | 91.0 |83.4 | [model](https://cloudstor.aarnet.edu.au/plus/s/rK2s3fdrpeP9k6l/download)
 [poseur_hrformer_big_coco_256x192](configs/poseur/coco/poseur_hrformer_big_coco_256x192.py)| 78.9  | 91.9 |85.6 | [model](https://cloudstor.aarnet.edu.au/plus/s/34udjbTr9p9Aigo/download)
 [poseur_hrformer_big_coco_384x288](configs/poseur/coco/poseur_hrformer_big_coco_384x288.py)| 79.6  | 92.1 |85.9 | [model](https://cloudstor.aarnet.edu.au/plus/s/KST3aSAlGd8PJpQ/download)
-[poseur_hrformer_big_coco_384x288](configs/poseur/coco/poseur_vit_base_coco_256x192.py)| 76.7  | 90.6 |83.5 | [model](https://cloudstor.aarnet.edu.au/plus/s/KST3aSAlGd8PJpQ/download)
+[poseur_vit_base_coco_256x192](configs/poseur/coco/poseur_vit_base_coco_256x192.py)| 76.7  | 90.6 |83.5 | [model](https://cloudstor.aarnet.edu.au/plus/s/46foUsIwzmHiVmb/download)
 
 ## COCO-WholeBody Benchmark (V0.5)
 
@@ -74,8 +74,8 @@ Compare Whole-body pose estimation results with other methods.
 |HRNet [2]        | 0.659 | 0.709 | 0.314 | 0.424 | 0.523 | 0.582 | 0.300 | 0.363 | 0.432 | 0.520 |
 |HRNet-body [2]   | 0.758 | 0.809 |   -   |   -   |   -   |   -   |   -   |   -   |   -   |   -   |
 |ZoomNet [3]      | 0.743 | 0.802 | 0.798 | 0.869 | 0.623 | 0.701 | 0.401 | 0.498 | 0.541 | 0.658 |
-|ZoomNas [4]      | 0.740 |       | 0.617 |       | 0.889 |       | 0.625 |       | 0.654 |       |
-|RTMPose [5]      | 0.730 |       | 0.734 |       | 0.898 |       | 0.587 |       | 0.669 |       |
+|ZoomNas [4]      | 0.740 |  -     | 0.617 |   -    | 0.889 |    -   | 0.625 |   -    | 0.654 |  -   |
+|RTMPose [5]      | 0.730 |   -    | 0.734 |   -    | 0.898 |    -   | 0.587 |   -    | 0.669 |  -   |
 |Poseur_ResNet50  | 0.655 | 0.732 | 0.615 | 0.742 | 0.844 | 0.900 | 0.560 | 0.673 | 0.587 | 0.681 |
 |Poseur_HRNet_W48 | 0.692 | 0.766 | 0.689 | 0.799 | 0.861 | 0.911 | 0.621 | 0.721 | 0.633 | 0.721 |
 
